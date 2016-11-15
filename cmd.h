@@ -1,3 +1,5 @@
+#include "compat.h"
+
 #define _WIN32_
 #include <ctype.h>
 /* use real function to avoid side effects */
@@ -9,25 +11,26 @@
 #include <stdio.h>
 #define  inpw _inpw                     /* To keep the compiler happy */
 #define  outpw _outpw                   /* To keep the compiler happy */
-#include <conio.h>
+//#include <conio.h> // WIN-SPECIFIC!
 #include <fcntl.h>
-#include <share.h>
+//#include <share.h> // WIN-SPECIFIC!
 #include <search.h>
 #include <setjmp.h>
 #ifdef DOSWIN32
 #undef setjmp
 #endif
-#include <sys\types.h>                  /* M001 - this file must...        */
-#include <sys\stat.h>                   /* ...precede this one             */
-#include <io.h>
+#include <sys/types.h>                  /* M001 - this file must...        */
+#include <sys/stat.h>                   /* ...precede this one             */
+//#include <io.h> // WIN-SPECIFIC!
 #include <time.h>
 #include <locale.h>
 #include <memory.h>
-#include <process.h>
+//#include <process.h> // WIN-SPECIFIC!
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
 
+/*
 #ifdef DOSWIN32
 #include <doscmd.h>
 #include <win32.h>
@@ -40,6 +43,7 @@
 #include <shlapip.h>
 #include <tchar.h>
 #endif
+*/
 
 #ifndef UNICODE
 #ifndef WIN95_CMD
@@ -78,9 +82,9 @@
 // by the C Runtimes IO.H
 //
 
-#define STDIN  0
-#define STDOUT 1
-#define STDERR 2
+#define STDIN  stdin
+#define STDOUT stdout
+#define STDERR stderr
 
 #include "cmdmsg.h"
 
@@ -322,8 +326,8 @@ struct envdata {
 #define PT_DIR      0   /* Flag to PrintTime, use Dir command time format   */
 #define PT_TIME     1   /* Flag to PrintTime, use Time command time format  */
 
-#define EDATE       0       /* Flag for eDate                          */
-#define ETIME       -1      /* Flag for eTime                          */
+#define CCLOCK_EDATE       0       /* Flag for eDate                          */
+#define CCLOCK_ETIME       -1      /* Flag for eTime                          */
 
 /* Definitions used by or passed to the functions in COTHER.C               */
 
@@ -370,9 +374,9 @@ struct envdata {
 #define COOKED      8   /* Bit pattern for setting KBD COOKED mode (M032)   */
 
 /* Defines used to define and manage file handle from the C runtime */
-typedef int CRTHANDLE;
-#define BADHANDLE   (CRTHANDLE)-1 // bad handle from different opens
-#define CRTTONT(fh) (HANDLE)_get_osfhandle(fh)
+typedef FILE* CRTHANDLE;
+#define BADHANDLE   NULL // bad handle from different opens
+#define CRTTONT(fh) (fh)
 
 
 /***     Definitions and structures used by COP.C                          */
@@ -1091,5 +1095,5 @@ extern TCHAR DbcsFlags[];
 #include "cmdproto.h"
 #include "console.h"
 #include "dir.h"
-#include <vdmapi.h>
-#include <conapi.h>
+//#include <vdmapi.h>
+//#include <conapi.h>

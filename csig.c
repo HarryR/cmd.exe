@@ -113,7 +113,7 @@ CheckCtrlC (
 
 void
 ExitAbort(
-    IN  ULONG   rcExitCode
+    ULONG   rcExitCode
     )
 {
 

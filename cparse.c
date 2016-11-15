@@ -934,12 +934,12 @@ struct node *ParseS4()
  */
         if (tmpio = n->rio) {
                 while (tmpio) {
-                        i = 1 << tmpio->rdhndl ;
+                        i = 1 << fileno(tmpio->rdhndl) ;
                         if (flg & i) {
-                                i = tmpio->rdhndl ;
+                                i = fileno(tmpio->rdhndl) ;
                                 tmpio = n->rio ;
                                 while (tmpio) {
-                                        if (i == tmpio->rdhndl) {
+                                        if (i == fileno(tmpio->rdhndl)) {
                                                 if (tmpio == n->rio)
                                                         n->rio = tmpio->nxt ;
                                                 else

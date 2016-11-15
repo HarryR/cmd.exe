@@ -182,7 +182,7 @@ struct cmdnode *n ;
                 cmd_printf(CrLf);
         } ;
 
-        return(LastRetCode = GetVerSetDateTime(n->argptr, EDATE)) ;
+        return(LastRetCode = GetVerSetDateTime(n->argptr, CCLOCK_EDATE)) ;
 }
 
 
@@ -238,7 +238,7 @@ struct cmdnode *n ;
                 cmd_printf(CrLf);
         } ;
 
-        return(LastRetCode = GetVerSetDateTime(n->argptr, ETIME)) ;
+        return(LastRetCode = GetVerSetDateTime(n->argptr, CCLOCK_ETIME)) ;
 }
 
 
@@ -505,7 +505,7 @@ int call ;
     LONG cbRead;
     int ret;
 
-    if (call == EDATE) {         /* Initialize date/time separator list */
+    if (call == CCLOCK_EDATE) {         /* Initialize date/time separator list */
         dtseps[0] = TEXT('/') ;
         dtseps[1] = TEXT('-') ;
         dtseps[2] = TEXT('.') ;
@@ -543,7 +543,7 @@ int call ;
                         dformat = MSG_ENTER_DEF_DATE ;
             } ;
 
-            if ( call == EDATE )
+            if ( call == CCLOCK_EDATE )
                 PutStdOut(dformat, ONEARG, DateSeparator );
             else
                 PutStdOut(MSG_ENTER_NEW_TIME, NOARGS);
@@ -586,7 +586,7 @@ int call ;
         GetLocalTime( &OsDateAndTime );
 
 
-        if (((call == EDATE) ? VerifyDateString(&OsDateAndTime,dtstr,dtseps) :
+        if (((call == CCLOCK_EDATE) ? VerifyDateString(&OsDateAndTime,dtstr,dtseps) :
                                VerifyTimeString(&OsDateAndTime,dtstr,dtseps))) {
 
             if (SetDateTime( &OsDateAndTime )) {
@@ -601,7 +601,7 @@ int call ;
 
         DEBUG((CLGRP, DALVL|TILVL, "GVSDT: Bad date/time entered.")) ;
 
-        PutStdOut(((call == EDATE) ? MSG_INVALID_DATE : MSG_REN_INVALID_TIME), NOARGS);
+        PutStdOut(((call == CCLOCK_EDATE) ? MSG_INVALID_DATE : MSG_REN_INVALID_TIME), NOARGS);
         *dtstr = NULLC ;
     }
     return( SUCCESS );

@@ -30,7 +30,7 @@ eCls(
     struct cmdnode *n
     )
 {
-
+    /*
     CONSOLE_SCREEN_BUFFER_INFO  ConsoleScreenInfo;
     COORD       ScrollTarget;
     CHAR_INFO   chinfo;
@@ -89,6 +89,8 @@ eCls(
 #endif
 
     SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), ConsoleScreenInfo.dwCursorPosition );
+    */
+    cmd_printf("%c[2J", 27);
     return(SUCCESS) ;
 }
 
@@ -210,6 +212,7 @@ eColor(
     struct cmdnode *n
     )
 {
+    /*
     CONSOLE_SCREEN_BUFFER_INFO  csbi;
     HANDLE  hStdOut;
     COORD   coord;
@@ -249,9 +252,11 @@ eColor(
     }
 
     return SetColor(wColor);
+    */
+    return SUCCESS;
 }
 
-
+/*
 // set the console to a given color -- if a console....
 int
 SetColor(
@@ -285,3 +290,4 @@ SetColor(
 
     return FAILURE;
 }
+*/

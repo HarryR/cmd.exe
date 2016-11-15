@@ -581,6 +581,7 @@ unsigned long arg;
  *
  */
 
+/*
 CRTHANDLE
 Copen_Work(fn, flags, fShareMode)
 TCHAR *fn ;
@@ -599,10 +600,9 @@ unsigned int flags, fShareMode;
     sa.lpSecurityDescriptor = NULL;
     sa.nLength = sizeof(SECURITY_ATTRIBUTES);
 
-/*  Note that O_RDONLY being a value of 0, cannot be tested for
- *  conflicts with any of the write type flags.
- */
-        if (((flags & (O_WRONLY | O_RDWR)) > 2) ||      /* Flags invalid?  */
+ //  Note that O_RDONLY being a value of 0, cannot be tested for
+ //  conflicts with any of the write type flags.
+        if (((flags & (O_WRONLY | O_RDWR)) > 2) ||      // Flags invalid?  
             ((flags & O_WRONLY) && (flags & O_APPEND))) {
 
                 DEBUG((CTGRP, COLVL, "COPEN: Bad flags issued %04x",flags)) ;
@@ -610,22 +610,19 @@ unsigned int flags, fShareMode;
                 return(BADHANDLE) ;
         } ;
 
-/*  M024 - Altered so that the only sharing restriction is to deny
- *  others write permission if this open is for writing.  Any other
- *  sharing is allowed.
- */
-        if(flags & (O_WRONLY | O_RDWR)) {       /* If Writing, set...      */
+//  M024 - Altered so that the only sharing restriction is to deny
+//  others write permission if this open is for writing.  Any other
+//  sharing is allowed.
+        if(flags & (O_WRONLY | O_RDWR)) {       // If Writing, set...     
                 fAccess = GENERIC_WRITE;
 
-                /*
-                 * deny write only if it is not console
-                 */
+                // deny write only if it is not console
 
                 if (_tcsicmp(fn, TEXT("con"))) {
                     fShareMode = FILE_SHARE_READ;
                 }
 
-                fCreate = CREATE_ALWAYS;/* ...open if exists, else create  */
+                fCreate = CREATE_ALWAYS;// ...open if exists, else create  
         }
         else {
                 fAccess = GENERIC_READ;
@@ -640,7 +637,7 @@ unsigned int flags, fShareMode;
 
                     if ( DosErr == ERROR_OPEN_FAILED ){
                         DosErr = ERROR_FILE_NOT_FOUND;
-                    } /* endif */
+                    } // endi
 
                     return(BADHANDLE) ;
                 }
@@ -653,7 +650,7 @@ unsigned int flags, fShareMode;
 
             if ( DosErr == ERROR_OPEN_FAILED ){
                 DosErr = ERROR_FILE_NOT_FOUND;
-            } /* endif */
+            } // endif 
 
             return(BADHANDLE) ;
         }
@@ -678,28 +675,31 @@ unsigned int flags, fShareMode;
                 fCreate = ReadFile(handle, &c, 1, &cb, NULL) ;
                 if (fCreate == 0) {
                     high = 0;
-                    SetFilePointer(handle, 0L, &high, FILE_END) ; /* ...back up 1 */
+                    SetFilePointer(handle, 0L, &high, FILE_END) ; // ...back up 1 
                     DEBUG((CTGRP,COLVL,"COPEN: ReadFile error %d",GetLastError())) ;
                 }
 
                 DEBUG((CTGRP,COLVL, "COPEN: Moving file ptr")) ;
 
-                if (c == CTRLZ) {               /* If end=^Z...    */
+                if (c == CTRLZ) {               // If end=^Z...   
                     high = -1;
-                    SetFilePointer(handle, -1L, &high, FILE_END) ; /* ...back up 1 */
+                    SetFilePointer(handle, -1L, &high, FILE_END) ; // ...back up 1 
                 }
         } ;
 
         SetList(fh) ;
         return(fh) ;
 }
+*/
 
 CRTHANDLE
 Copen(fn, flags)
 TCHAR *fn ;
 unsigned int flags ;
 {
-    return( Copen_Work(fn, flags, FILE_SHARE_READ | FILE_SHARE_WRITE ) ); /* deny nothing */
+    //return( Copen_Work(fn, flags, FILE_SHARE_READ | FILE_SHARE_WRITE ) ); /* deny nothing */
+    return fopen(fn, "rwb");
+    // TODO: if (_tcsicmp(fn, TEXT("con"))) {
 }
 
 /***    InSetList - Determine if handle is in signal cleanup table
@@ -734,7 +734,7 @@ unsigned long InSetList(
                         ++cnt ;
                 } ;
 
-                return( (OHTbl[cnt]) & ((unsigned long)1 << fh) );
+                return( (OHTbl[cnt]) & ((unsigned long)1 << fileno(fh)) );
         } ;
         return( FALSE );
 }
@@ -864,7 +864,7 @@ CRTHANDLE fh ;
               OHTbl[cnt] &= ~((unsigned long)1 << fuse) ;
              }
 
-           ret_val = _close(fh);         /* Delete file handle */
+           ret_val = fclose(fh);         /* Delete file handle */
 
            return(ret_val);
 }
@@ -906,7 +906,7 @@ SetList(
                 } ;
 
 
-                OHTbl[cnt] |= ((unsigned long)1 << fh) ;
+                OHTbl[cnt] |= ((unsigned long)1 << fileno(fh)) ;
         } ;
 }
 
@@ -1496,11 +1496,11 @@ unsigned dow;
 
 CRTHANDLE
 Copen_Work2(fn, flags, fShareMode, FSwitch)
-TCHAR *fn ;                     /* filename                        */
-unsigned int flags, fShareMode, FSwitch ;  /* flags and special case flags    */
+TCHAR *fn ;                     // filename                        
+unsigned int flags, fShareMode, FSwitch ;  // flags and special case flags   
 {
-    HANDLE handl ;              /* Handle ret'd                    */
-    CRTHANDLE rcode;            /* return code                     */
+    HANDLE handl ;              // Handle ret'd                    
+    CRTHANDLE rcode;            // return code                     
     DWORD fAccess;
     DWORD fCreate;
     SECURITY_ATTRIBUTES sa;
@@ -1510,40 +1510,36 @@ unsigned int flags, fShareMode, FSwitch ;  /* flags and special case flags    */
     sa.nLength = sizeof(SECURITY_ATTRIBUTES);
 
 
-/***************************************************************************/
-/*  Note that O_RDONLY being a value of 0, cannot be tested for            */
-/*  conflicts with any of the write type flags.                            */
-/***************************************************************************/
+//  Note that O_RDONLY being a value of 0, cannot be tested for            
+//  conflicts with any of the write type flags.                            
 
         DBG_UNREFERENCED_PARAMETER( FSwitch);
-    if (((flags & (O_WRONLY | O_RDWR)) > 2) ||  /* Flags invalid?          */
-       ((flags & O_WRONLY) &&                   /*                         */
-       (flags & O_APPEND))) {                   /*                         */
+    if (((flags & (O_WRONLY | O_RDWR)) > 2) ||  // Flags invalid?          
+       ((flags & O_WRONLY) &&                   //                         
+       (flags & O_APPEND))) {                   //                         
         DEBUG((CTGRP, COLVL, "COPEN: Bad flags issued %04x",flags)) ;
-        rcode = BADHANDLE;                      /* set bad handle                  */
+        rcode = BADHANDLE;                      // set bad handle
     }
     else {
 
-/***************************************************************************/
-/*  M024 - Altered so that the only sharing restriction is to deny         */
-/*  others write permission if this open is for writing.  Any other        */
-/*  sharing is allowed.                                                    */
-/***************************************************************************/
+//  M024 - Altered so that the only sharing restriction is to deny         
+//  others write permission if this open is for writing.  Any other        
+//  sharing is allowed.                                                    
 
-        if(flags & (O_WRONLY | O_RDWR)) {       /* If Writing, set...      */
+        if(flags & (O_WRONLY | O_RDWR)) {       // If Writing, set...      
                 fAccess = GENERIC_WRITE;
                 if (flags & O_RDWR)
                     fAccess |= GENERIC_READ;
 
-                /*
-                 * deny write only if it is not console
-                 */
+                //
+                // deny write only if it is not console
+                //
 
                 if (_tcsicmp(fn, TEXT("con"))) {
                     fShareMode = FILE_SHARE_READ;
                 }
 
-                fCreate = CREATE_ALWAYS;/* ...open if exists, else create  */
+                fCreate = CREATE_ALWAYS;// ...open if exists, else create  
         }
         else {
                 fAccess = GENERIC_READ;
@@ -1618,7 +1614,12 @@ TCHAR *fn ;                             /* file name       */
 unsigned int flags ;                            /* open flags      */
 unsigned FSwitch;
 {
-    return(Copen_Work2(fn, flags, FILE_SHARE_READ | FILE_SHARE_WRITE, FSwitch));
+    //return(Copen_Work2(fn, flags, FILE_SHARE_READ | FILE_SHARE_WRITE, FSwitch));
+    int fd = open(fn, flags);
+    if( fd == -1 )
+        return NULL;
+    // Only used is O_RDWR, O_WRONLY
+    return fdopen(fd, "rw");
 }
 
 
@@ -1793,7 +1794,7 @@ Return: the user response
 
         dwOutputModeCur = dwOutputModeOld | ENABLE_PROCESSED_OUTPUT;
         fOutputModeSet = TRUE;
-        SetConsoleMode(hndStdOut,dwOutputModeCur);
+        //SetConsoleMode(hndStdOut,dwOutputModeCur);
         GetLastError();
 
     }
@@ -1806,7 +1807,7 @@ Return: the user response
         dwInputModeCur = dwInputModeOld | ENABLE_LINE_INPUT |
                          ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT;
         fInputModeSet = TRUE;
-        SetConsoleMode(hndStdIn,dwInputModeCur);
+        //SetConsoleMode(hndStdIn,dwInputModeCur);
         GetLastError();
 
     }
@@ -1858,10 +1859,10 @@ Return: the user response
         }
     }
     if (fOutputModeSet) {
-        SetConsoleMode( hndStdOut, dwOutputModeOld );
+        //SetConsoleMode( hndStdOut, dwOutputModeOld );
     }
     if (fInputModeSet) {
-        SetConsoleMode( hndStdIn, dwInputModeOld );
+        //SetConsoleMode( hndStdIn, dwInputModeOld );
     }
     return((BOOLEAN)(chAnsw == chY_Char));
 }
@@ -2129,6 +2130,7 @@ ResetConsoleMode( void )
     DWORD dwDesiredOutputMode = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
     DWORD dwDesiredInputMode = ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT;
 
+    /*
     SetConsoleMode(CRTTONT(STDOUT), dwCurOutputConMode);
     if (GetConsoleMode(CRTTONT(STDOUT), &dwCurOutputConMode)) {
         if ((dwCurOutputConMode & dwDesiredOutputMode) != dwDesiredOutputMode) {
@@ -2146,6 +2148,7 @@ ResetConsoleMode( void )
             SetConsoleMode(CRTTONT(STDIN), dwCurInputConMode);
         }
     }
+    */
 }
 
 

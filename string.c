@@ -33,10 +33,11 @@ BOOLEAN DbcsLeadCharTable[ 256 ];
 // we don't have to use DBCS aware string functions.
 //
 
-extern CPINFO CurrentCPInfo;
+//extern CPINFO CurrentCPInfo;
 extern UINT CurrentCP;
-BOOLEAN AnyDbcsLeadChars = FALSE;
+//BOOLEAN AnyDbcsLeadChars = FALSE;
 
+/*
 VOID
 InitializeDbcsLeadCharTable(
     )
@@ -56,10 +57,10 @@ InitializeDbcsLeadCharTable(
         CurrentCPInfo.LeadByte[3] = 0xfc;
         CurrentCPInfo.LeadByte[4] = 0;
         CurrentCPInfo.LeadByte[5] = 0;
-#else /* not JAPAN */
+#else // not JAPAN
         CurrentCPInfo.LeadByte[0] = 0;
         CurrentCPInfo.LeadByte[1] = 0;
-#endif /* JAPAN */
+#endif // JAPAN 
     }
 
     memset( DbcsLeadCharTable, 0, 256 * sizeof (BOOLEAN)  );
@@ -73,6 +74,7 @@ InitializeDbcsLeadCharTable(
         AnyDbcsLeadChars = FALSE;
 
 }
+*/
 
  /***
  * mystrchr(string, c) - search a string for a character
@@ -149,7 +151,7 @@ TCHAR const *str2;
         /* Since str2 may not contain any double byte characters,
            when we see a double byte character in str1, we just skip it.
            Otherwise, use mystrchr to see if we have a match */
-        while (c = *str1++) {
+        while ((c = *str1++)) {
                 if (mystrchr(str2, c))
                         break;
                 position++;

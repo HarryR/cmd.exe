@@ -37,9 +37,7 @@ struct node *
 
 void CMDexit(int rc);
 
-VOID
-InitializeDbcsLeadCharTable(
-    );
+//VOID InitializeDbcsLeadCharTable();
 TCHAR * mystrchr(register TCHAR const *string, TCHAR c);
 TCHAR * mystrrchr(register TCHAR const *string, TCHAR c);
 size_t mystrcspn(TCHAR const *str1, TCHAR const *str2);
@@ -420,9 +418,9 @@ void mytcsnset ( PTCHAR string, TCHAR val, int count);
 
 DWORD MyFormatMessageW( unsigned, DWORD, LPVOID, DWORD, DWORD, LPTSTR, DWORD, va_list *Arguments );
 
-BOOL ReadBufFromInput   (HANDLE h, TCHAR*pBuf, int cch, int*pcch);
-BOOL ReadBufFromConsole (HANDLE h, TCHAR*pBuf, int cch, int*pcch);
-BOOL ReadBufFromFile    (HANDLE h, TCHAR*pBuf, int cch, int*pcch);
+BOOL ReadBufFromInput   (FILE *h, TCHAR*pBuf, int cch, int*pcch);
+//BOOL ReadBufFromConsole (HANDLE h, TCHAR*pBuf, int cch, int*pcch);
+BOOL ReadBufFromFile    (FILE *h, TCHAR*pBuf, int cch, int*pcch);
 #if defined(JAPAN) && defined(UNICODE)
 BOOL IsFullWidth(TCHAR wch);
 int  SizeOfHalfWidthString(TCHAR *pwch);
@@ -431,8 +429,8 @@ int  SizeOfHalfWidthString(TCHAR *pwch);
 typedef
 BOOL
 (WINAPI *LPCOPYFILEEX_ROUTINE)(
-    LPCWSTR lpExistingFileName,
-    LPCWSTR lpNewFileName,
+    LPCSTR lpExistingFileName,
+    LPCSTR lpNewFileName,
     LPPROGRESS_ROUTINE lpProgressRoutine OPTIONAL,
     LPVOID lpData OPTIONAL,
     LPBOOL pbCancel OPTIONAL,
@@ -450,7 +448,7 @@ LPISDEBUGGERPRESENT_ROUTINE lpIsDebuggerPresent;
 int SetColor(WORD attr);
 int DoComplete(TCHAR *buffer,int len ,int bForward,int bTouched);
 
-#ifdef WIN95_CMD
+#if defined(WIN95_CMD) && !defined(PORTABLE_CMD)
 BOOL Win95ReadConsoleA(HANDLE hIn,LPSTR pBuf,DWORD cch,LPDWORD pcch,LPVOID lpReserved);
 #undef ReadConsole
 #define ReadConsole Win95ReadConsoleA

@@ -9,7 +9,7 @@
 
 #include "cmd.h"
 
-#ifdef WIN95_CMD
+#if defined(WIN95_CMD) && !defined(PORTABLE_CMD)
 
 // adv declarations....
 extern BOOLEAN	CtrlCSeen;

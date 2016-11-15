@@ -64,8 +64,8 @@
 #define ASCENDING	0
 #define ESUCCESS 0
 
-int _cdecl CmpName( const void *, const void *);
-int _cdecl CmpExt ( const void *, const void *);
-int _cdecl CmpTime( const void *, const void *);
-int _cdecl CmpSize( const void *, const void *);
-int _cdecl CmpType( const void *, const void *);
+int CmpName( const void *, const void *);
+int CmpExt ( const void *, const void *);
+int CmpTime( const void *, const void *);
+int CmpSize( const void *, const void *);
+int CmpType( const void *, const void *);

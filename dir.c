@@ -1531,7 +1531,6 @@ Return Value:
 
 --*/
 int
-_cdecl
 CmpName(
     const void *elem1,
     const void *elem2
@@ -1555,7 +1554,6 @@ Return Value:
 
 --*/
 int
-_cdecl
 CmpExt(
     const void *pszElem1,
     const void *pszElem2
@@ -1609,7 +1607,6 @@ Return Value:
 
 --*/
 int
-_cdecl
 CmpTime(
     const void *pszElem1,
     const void *pszElem2
@@ -1658,7 +1655,6 @@ Return Value:
 
 --*/
 int
-_cdecl
 CmpSize(
     const void * pszElem1,
     const void * pszElem2
@@ -1693,7 +1689,6 @@ Return Value:
 
 --*/
 int
-_cdecl
 CmpType(
     const void *pszElem1,
     const void *pszElem2
@@ -1720,7 +1715,6 @@ Return Value:
 
 --*/
 int
-_cdecl
 SortCompare(
     IN  const void * elem1,
     IN  const void * elem2

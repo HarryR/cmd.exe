@@ -7,8 +7,8 @@
 #define NSPC    0                                                               // Don't use space
 #define YSPC    1                                                               // Do use space
 
-extern CPINFO CurrentCPInfo;
-extern UINT   CurrentCP;
+//extern CPINFO CurrentCPInfo;
+//extern UINT   CurrentCP;
 extern ULONG  LastMsgNo;
 //
 // Jump buffers used to return to main loop after some error condition
@@ -140,6 +140,7 @@ VOID    ResetCtrlC();
 //
 // to monitor stack usage
 //
+/*
 extern BOOLEAN  flChkStack;
 extern PVOID    FixedPtrOnStack;
 
@@ -153,9 +154,9 @@ typedef struct {
 extern STACK_USE   GlStackUsage;
 
 extern int ChkStack (PVOID pFixed, STACK_USE *pStackUse);
+*/
 
-
-
+int
 _CRTAPI1
 main()
 
@@ -227,6 +228,7 @@ Return Value:
     // CMD problems.
     //
 
+    /*
     flChkStack = 1;
 
     FixedPtrOnStack = (VOID *) &VarOnStack;     // to be used in ChkStack()
@@ -234,13 +236,14 @@ Return Value:
     if ( ChkStack (FixedPtrOnStack, &GlStackUsage) == FAILURE ) {
         flChkStack = 0;
     }
+    */
 
 
     //
     // Initialize the DBCS lead byte table based on the current locale.
     //
 
-    InitializeDbcsLeadCharTable( );
+    //InitializeDbcsLeadCharTable( );
 
     //
     // Set base APIs to operate in OEM mode
@@ -333,9 +336,10 @@ Return Value:
     // CRLF translations screw up the lexer because FillBuf() wants to
     // seek around in the file.
     //
+    /*
     if(InputType == READFILE) {
         _setmode(STDIN,_O_BINARY);
-    }
+    }*/
 
     //
     // Loop till out of input or error parsing.
@@ -367,12 +371,12 @@ Return Value:
             // Get current CodePage Info.  We need this to decide whether
             // or not to use half-width characters.
             //
-            GetCPInfo((CurrentCP=GetConsoleOutputCP()), &CurrentCPInfo);
+            //GetCPInfo((CurrentCP=GetConsoleOutputCP()), &CurrentCPInfo);
             //
             // Maybe console output code page was changed by CHCP or MODE,
             // so need to reset LanguageID to correspond to code page.
             //
-            SetTEBLangID();
+            //SetTEBLangID();
 
             DEBUG((MNGRP, MNLVL, "MAIN: Dispatch returned.")) ;
         }
@@ -868,6 +872,7 @@ Return Value:
 }
 
 
+int
 AddRedir(
     IN struct cmdnode *pcmdnodeOriginal,
     IN struct cmdnode *pcmdnodeNew
@@ -1548,6 +1553,7 @@ Return Value:
     return( rc );
 }
 
+int
 UnBuild(
     IN struct node *pnode,
     IN PTCHAR pbCmdBuf

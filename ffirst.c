@@ -1,6 +1,7 @@
 #include "cmd.h"
 
 PHANDLE FFhandles = NULL;
+size_t FFhandles_sz = 0;
 unsigned FFhndlsaved = 0;
 extern unsigned DosErr ;
 
@@ -194,16 +195,17 @@ FindFirst(
         // then allocate space for table.
         //
         if (FFhandles == NULL) {
-
-            FFhandles = (PHANDLE)HeapAlloc(GetProcessHeap(), 0, 5 * sizeof(PHANDLE));
+            FFhandles_sz = 5 * sizeof(PHANDLE);
+            FFhandles = (PHANDLE)HeapAlloc(GetProcessHeap(), 0, FFhandles_sz);
 
         } else {
 
             //
             // Check if we have space to hold new handle entry
             //
-            if (((FFhndlsaved + 1)* sizeof(PHANDLE)) > HeapSize(GetProcessHeap(), 0, FFhandles)) {
-                FFhandles = (PHANDLE)HeapReAlloc(GetProcessHeap(), 0, (void*)FFhandles, (FFhndlsaved+1)*sizeof(PHANDLE));
+            if (((FFhndlsaved + 1)* sizeof(PHANDLE)) > FFhandles_sz) {
+                FFhandles_sz = (FFhndlsaved+1)*sizeof(PHANDLE);
+                FFhandles = (PHANDLE)HeapReAlloc(GetProcessHeap(), 0, (void*)FFhandles, FFhandles_sz);
             }
          }
         if (FFhandles != NULL) {
@@ -336,8 +338,9 @@ HANDLE hn;
         // BUGBUG: this is also allocated in ffirst.c. Combine management
         //                 of this into one module.
         //
-        if (HeapSize(GetProcessHeap(), 0, FFhandles) > 5*sizeof(PHANDLE)) {
-            FFhandles = (PHANDLE)HeapReAlloc(GetProcessHeap(), 0, (void*)FFhandles,FFhndlsaved*sizeof(PHANDLE));
+        if (FFhandles_sz > 5*sizeof(PHANDLE)) {
+            FFhandles_sz = FFhndlsaved*sizeof(PHANDLE);
+            FFhandles = (PHANDLE)HeapReAlloc(GetProcessHeap(), 0, (void*)FFhandles,FFhandles_sz);
         }
     }
 

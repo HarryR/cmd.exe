@@ -796,7 +796,7 @@ GetFS(
                     // Update the accounting information for file buffer info.
                     //
                     cbfsCur += pffCur->cb;
-                    (char*)(pffCur) += pffCur->cb;
+                    pffCur = (PFF)((char*)pffCur + pffCur->cb); //(char*)(pffCur) += pffCur->cb;
 
                     //
                     // make sure we can handle the next entry.
@@ -877,7 +877,7 @@ GetFS(
             for (irgpffCur = 0; irgpffCur < cff; irgpffCur++ ) {
 
                 pfsCur->prgpff[irgpffCur] = pffCur;
-                (char*)(pffCur) += pffCur->cb;
+                pffCur = (PFF)((char*)pffCur + pffCur->cb); //(char*)(pffCur) += pffCur->cb;
 
             }
         }

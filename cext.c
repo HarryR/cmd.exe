@@ -1206,7 +1206,7 @@ TCHAR *tokpath;
  *      If displaying, SUCCESS is always returned.
  *
  */
-
+/*
 int eAssoc(n)
 struct cmdnode *n ;
 {
@@ -1223,9 +1223,9 @@ int AssocWork(n)
 struct cmdnode *n ;
 {
         HKEY hKeyClasses;
-        TCHAR *tas ;    /* Tokenized argument string    */
-        TCHAR *wptr ;   /* Work pointer                 */
-        int i ;                 /* Work variable                */
+        TCHAR *tas ;    // Tokenized argument string    
+        TCHAR *wptr ;   // Work pointer                 
+        int i ;                 // Work variable                
         int rc ;
 
 
@@ -1241,9 +1241,9 @@ struct cmdnode *n ;
         else {
                 for (wptr = tas, i = 0 ; *wptr ; wptr += mystrlen(wptr)+1, i++)
                         ;
-                /* If too many parameters were given, the second parameter */
-                /* wasn't an equal sign, or they didn't specify a string   */
-                /* return an error message.                                */
+                // If too many parameters were given, the second parameter 
+                // wasn't an equal sign, or they didn't specify a string   
+                // return an error message.                                
                 if ( i > 3 || *(wptr = tas+mystrlen(tas)+1) != EQ ||
                     !mystrlen(mystrcpy(tas, stripit(tas))) ) {
                         if (i==1) {
@@ -1261,7 +1261,7 @@ struct cmdnode *n ;
 
         return rc;
 }
-
+*/
 
 
 
@@ -1276,7 +1276,7 @@ struct cmdnode *n ;
  *      SUCCESS if all goes well
  *      FAILURE if it runs out of memory or cannot lock the env. segment
  */
-
+/*
 int DisplayAssoc(hKeyClasses, tas)
 HKEY hKeyClasses;
 TCHAR *tas;
@@ -1326,7 +1326,7 @@ TCHAR *tas;
 
         return(rc);
 }
-
+*/
 
 
 /***    SetAssoc - controls adding/changing a file association
@@ -1346,7 +1346,7 @@ TCHAR *tas;
  *      FAILURE otherwise.
  *
  */
-
+/*
 int SetAssoc(hKeyClasses, fileext, filetype)
 HKEY hKeyClasses;
 TCHAR *fileext ;
@@ -1371,7 +1371,7 @@ TCHAR *filetype ;
 
     return rc;
 }
-
+*/
 
 /***    eFType - execute an FType command
  *
@@ -1391,7 +1391,7 @@ TCHAR *filetype ;
  *      If displaying, SUCCESS is always returned.
  *
  */
-
+/*
 int eFType(n)
 struct cmdnode *n ;
 {
@@ -1408,9 +1408,9 @@ int FTypeWork(n)
 struct cmdnode *n ;
 {
         HKEY hKeyClasses;
-        TCHAR *tas ;    /* Tokenized argument string    */
-        TCHAR *wptr ;   /* Work pointer                 */
-        int i ;                 /* Work variable                */
+        TCHAR *tas ;    // Tokenized argument string    
+        TCHAR *wptr ;   // Work pointer                 
+        int i ;                 // Work variable               
         int rc ;
 
 
@@ -1426,9 +1426,9 @@ struct cmdnode *n ;
         else {
                 for (wptr = tas, i = 0 ; *wptr ; wptr += mystrlen(wptr)+1, i++)
                         ;
-                /* If too many parameters were given, the second parameter */
-                /* wasn't an equal sign, or they didn't specify a string   */
-                /* return an error message.                                */
+                // If too many parameters were given, the second parameter 
+                // wasn't an equal sign, or they didn't specify a string   
+                // return an error message.                                
                 if ( i > 3 || *(wptr = tas+mystrlen(tas)+1) != EQ ||
                     !mystrlen(mystrcpy(tas, stripit(tas))) ) {
                         if (i==1) {
@@ -1447,7 +1447,7 @@ struct cmdnode *n ;
         return rc;
 }
 
-
+*/
 
 
 /***    DisplayFType - display a specific file type or all
@@ -1461,7 +1461,7 @@ struct cmdnode *n ;
  *      SUCCESS if all goes well
  *      FAILURE if it runs out of memory or cannot lock the env. segment
  */
-
+/*
 int DisplayFType(hKeyClasses, tas)
 HKEY hKeyClasses;
 TCHAR *tas;
@@ -1532,7 +1532,7 @@ TCHAR *tas;
 
         return(rc);
 }
-
+*/
 
 
 /***    SetFType - controls adding/changing the open command associated with a file type
@@ -1552,7 +1552,7 @@ TCHAR *tas;
  *      FAILURE otherwise.
  *
  */
-
+/*
 int SetFType(hKeyClasses, filetype, opencmd)
 HKEY hKeyClasses;
 TCHAR *filetype ;
@@ -1621,8 +1621,9 @@ TCHAR *opencmd ;
     RegCloseKey(hKeyOpenCmd);
     return rc;
 }
+*/
 
-
+/*
 typedef
 NTSTATUS
 (NTAPI *PNTQUERYINFORMATIONPROCESS)(
@@ -1734,3 +1735,4 @@ GetProcessSubsystemType(
 
     return Subsystem;
 }
+*/

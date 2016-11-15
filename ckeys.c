@@ -69,6 +69,7 @@ int *ReturnLength; /* the number of characters in the buffer, not */
 /*    ROUTINES: 						*/
 /**************** END OF SPECIFICATIONS *************************/
 
+int
 eKeys( n )
 struct cmdnode *n; /* the command node for the Keys command */
 {

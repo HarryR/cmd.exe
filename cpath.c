@@ -375,6 +375,7 @@ struct cmdnode *n ;
         } else {
             if (PushCurDir()) {
                 LastRetCode = SUCCESS;
+                /*
                 //
                 // If extensions are enabled and a UNC name was given, then do
                 // a temporary NET USE to define a drive letter that we can
@@ -421,6 +422,7 @@ struct cmdnode *n ;
                     }
 godrive:        ;
                 }
+                */
                 if (LastRetCode == NO_ERROR &&
                     (LastRetCode = ChangeDir2( tas, TRUE )) == SUCCESS) {
                     if (tas[1] == ':')

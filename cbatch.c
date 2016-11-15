@@ -59,9 +59,9 @@ extern jmp_buf MainEnv ;
 #define BIG_BAT_NEST             200
 #define MAX_STACK_USE_PERCENT     90
 
-BOOLEAN flChkStack;
+//BOOLEAN flChkStack;
 int     CntBatNest;
-PVOID   FixedPtrOnStack;
+//PVOID   FixedPtrOnStack;
 
 typedef struct {
     PVOID   Base;
@@ -93,7 +93,7 @@ int  glBatType = NO_TYPE;
  *
  *
  */
-
+/*
 int ChkStack (PVOID pFixed, STACK_USE *pStackUse )
 
 {
@@ -199,7 +199,7 @@ int ChkStack (PVOID pFixed, STACK_USE *pStackUse )
     return (SUCCESS);
 
 }
-
+*/
 
 /***    BatAbort - terminate the batch processing unconditionally.
  *
@@ -303,7 +303,7 @@ int typflg ;                            /* M011 - "how called" flag        */
         struct envdata *CopyEnv() ;
         ULONG          StackUsedPerCent,
                        u1, u2, u3;
-        STACK_USE      StackUsage;
+        //STACK_USE      StackUsage;
         PTCHAR         tmp;
 
 #ifdef USE_STACKAVAIL                     // unfortunately not available
@@ -335,6 +335,7 @@ int typflg ;                            /* M011 - "how called" flag        */
         // to check stack only if we are looping too much,
         // to avoid unnecessary overhead
 
+        /*
         if (flChkStack && ( CntBatNest > BIG_BAT_NEST ) ) {
             if ( ChkStack (FixedPtrOnStack, &StackUsage) == FAILURE )  {
                 flChkStack = 0;
@@ -364,7 +365,7 @@ int typflg ;                            /* M011 - "how called" flag        */
                 }
             }
         }
-
+        */
 
         if (typflg)
             CntBatNest++;
@@ -511,6 +512,7 @@ int typflg ;                            /* M011 - "how called" flag        */
  *
  */
 
+int
 BatLoop(bdat,c)
 struct batdata *bdat ;
 struct cmdnode *c ;
@@ -578,8 +580,8 @@ struct cmdnode *c ;
                     DEBUG((BPGRP, BPLVL, "BLOOP: fh = %d", (ULONG)fh)) ;
 
 
-                    n = Parser(READFILE, (int)fh, bdat->stacksize) ; /* Parse   */
-                    bdat->filepos = _tell((long)fh) ; // next statement
+                    n = Parser(READFILE, fh, bdat->stacksize) ; /* Parse   */
+                    bdat->filepos = ftell(fh) ; // next statement
                     Cclose(fh) ;
 
                     if ((n == NULL) || (n == (struct node *) EOS)) {
@@ -679,6 +681,8 @@ struct cmdnode *c ;
                 DEBUG((BPGRP, BPLVL, "BLOOP: ...node type = %d",n->type)) ;
 
                         batretcode = Dispatch(RIO_BATLOOP, n) ;
+
+/*
 #if defined(JAPAN)
                 {
                 extern CPINFO CurrentCPInfo;
@@ -696,6 +700,7 @@ struct cmdnode *c ;
                 SetTEBLangID();
                 }
 #endif // defined(JAPAN)
+*/
 
                 } ;
         } ;
@@ -740,6 +745,7 @@ struct cmdnode *c ;
  *
  */
 
+int
 SetBat(n, fp)
 struct cmdnode *n ;
 TCHAR *fp ;
@@ -813,7 +819,7 @@ TCHAR *fp ;
                     // /Q on batch script invocation only supported when extensions disabled
                     //
                     s = CurBat->orgargs ;
-                    while (s = mystrchr(s, SwitChar)) {
+                    while ((s = mystrchr(s, SwitChar))) {
                             if (_totupper(*(++s)) == QUIETCH) {
                                     EchoFlag = E_OFF ;
                                     mystrcpy(s-1,s+1) ;
@@ -1259,6 +1265,7 @@ void FvarRestore()
            }                     /* @@ */
 }
 
+int
 FRecurseWork(
     TCHAR *path,
     TCHAR *filepart,
@@ -1268,6 +1275,7 @@ FRecurseWork(
     TCHAR *argtoks
     );
 
+int
 FParseWork(
     struct fornode *pForNode,
     struct cpyinfo *fsinfo,
@@ -1276,6 +1284,7 @@ FParseWork(
     BOOL bFirstLoop
     );
 
+int
 FLoopWork(
     struct fornode *pForNode,
     struct cpyinfo *fsinfo,
@@ -1364,7 +1373,7 @@ int eFor(struct fornode *pForNode)
                 // Convert the loop value to text and set the value of the loop
                 // variable
                 //
-                wsprintf(ForLoopBuffer, TEXT("%d"), ForLoopValue);
+                sprintf(ForLoopBuffer, TEXT("%d"), ForLoopValue);
                 Fsubs[i] = ForLoopBuffer;
 
                 //
@@ -1505,6 +1514,7 @@ int eFor(struct fornode *pForNode)
  *
  */
 
+int
 FRecurseWork(
     TCHAR *path,
     TCHAR *filepart,
@@ -1614,6 +1624,7 @@ FRecurseWork(
  *
  */
 
+int
 FParseWork(
     struct fornode *pForNode,
     struct cpyinfo *fsinfo,
@@ -1818,7 +1829,7 @@ badtokens:
             // Execute the command line, getting a handle to its standard output
             // stream.
             //
-            pChildOutput = _popen( spBegin, "rb" );
+            pChildOutput = popen( spBegin, "rb" );
             if (pChildOutput == NULL) {
                 PutStdErr(MSG_DIR_BAD_COMMAND_OR_FILE, ONEARG, argtoks);
                 return(GetLastError());
@@ -1840,7 +1851,7 @@ badtokens:
                         spBegin = HeapAlloc(GetProcessHeap(), 0, cbTotal);
                     if (spBegin == NULL) {
                         PutStdErr(MSG_NO_MEMORY, ONEARG, argtoks);
-                        _pclose(pChildOutput);
+                        pclose(pChildOutput);
                         return(ERROR_NOT_ENOUGH_MEMORY);
                     }
                 }
@@ -1854,7 +1865,7 @@ badtokens:
             // All done.  Close the child output handle, which will actually wait
             // for the child process to terminate.
             //
-            _pclose(pChildOutput);
+            pclose(pChildOutput);
 
             //
             // Reallocate memory to what we actually need for the UNICODE representation
@@ -1908,7 +1919,7 @@ badtokens:
                 tmpargtoks = HeapAlloc(GetProcessHeap(), 0, (dwFileSize+2) * sizeof( TCHAR ));
                 if (tmpargtoks == NULL) {
                     PutStdErr(MSG_NO_MEMORY, ONEARG, argtoks);
-                    CloseHandle( hFile );
+                    CloseFile( hFile );
                     return(ERROR_NOT_ENOUGH_MEMORY);
                 }
                 dwBytesRead = 0xFFFFFFFF;
@@ -1922,7 +1933,7 @@ badtokens:
                           &dwBytesRead,
                           NULL
                         );
-                CloseHandle(hFile);
+                CloseFile(hFile);
 gotfileinmemory:
                 if (dwBytesRead == dwFileSize) {
                     //
@@ -2092,6 +2103,7 @@ gotfileinmemory:
  *
  */
 
+int
 FLoopWork(
     struct fornode *pForNode,
     struct cpyinfo *fsinfo,
@@ -2217,9 +2229,8 @@ FLoopWork(
  *
  */
 
-FWork(n,bFirstLoop)
-struct node *n ;
-BOOL bFirstLoop ;
+int
+FWork(struct node *n, BOOL bFirstLoop)
 {
         int forretcode ;                /* Dispatch Retcode or FORERROR    */
         void DisplayStatement() ;       /* M008 - made void                */
@@ -2277,9 +2288,7 @@ BOOL bFirstLoop ;
  *
  */
 
-int SubFor(n,bFirstLoop)
-struct node *n ;
-BOOL bFirstLoop ;
+int SubFor(struct node *n, BOOL bFirstLoop)
 {
         int j ; /* Temps used to make substitutions...     */
         struct relem *io ;      /* M017 - Pointer to redir list            */
@@ -2400,11 +2409,8 @@ BOOL bFirstLoop ;
  *
  */
 
-SFWork(n, src, index, bFirstLoop)
-struct node *n ;
-TCHAR **src ;
-int index ;
-BOOL bFirstLoop ;
+int
+SFWork(struct node *n, TCHAR **src, int index, BOOL bFirstLoop)
 {
         TCHAR *dest ;   /* Destination string pointer              */
         TCHAR *srcstr,          /* Source string pointer                   */
@@ -2631,7 +2637,7 @@ int eGoto(n)
 struct cmdnode *n ;
 {
         struct batdata *bdat ; /* Ptr to current batdata struct   */
-        unsigned cnt ;                  /* Count of bytes read from file   */
+        int cnt ;                  /* Count of bytes read from file   */
         TCHAR s[128],                    /* Ptr to search label             */
              t[128],                    /* Ptr to found label              */
              *p1,                       /* Place keeper ptr 1              */
@@ -2691,7 +2697,7 @@ struct cmdnode *n ;
                 CheckCtrlC();
                 if (((bdat->filepos = SetFilePointer(CRTTONT(fh), 0, NULL, FILE_CURRENT)) >= savepos && !frstpass) ||
                     /* BUGBUG - must check for UNICODE batch file */
-                    ReadBufFromInput(CRTTONT(fh),TmpBuf,512,(LPDWORD)&cnt)==0 ||
+                    ReadBufFromInput(CRTTONT(fh),TmpBuf,512,&cnt)==0 ||
                     cnt == 0 ||
                     cnt == EOF || TmpBuf[0] == NULLC || s[0] == NULLC) {
 
@@ -3663,13 +3669,13 @@ int eBreak(struct cmdnode *n)
 
 BOOL
 ReadBufFromFile(
-    HANDLE      h,
+    FILE*       h,
     TCHAR       *pBuf,
     int         cch,
     int         *pcch)
 {
     int         cb;
-    UCHAR       *pch = AnsiBuf;
+    CHAR       *pch = AnsiBuf;
     int         cchNew;
     DWORD       fPos;
 
@@ -3717,6 +3723,7 @@ ReadBufFromFile(
     return cch;
 }
 
+/*
 BOOL
 ReadBufFromConsole(
     HANDLE      h,
@@ -3882,14 +3889,16 @@ ReadBufFromConsole(
 
     return ReadConsoleResult;
 }
+*/
 
 BOOL
 ReadBufFromInput(
-    HANDLE      h,
+    FILE*      h,
     TCHAR       *pBuf,
     int         cch,
     int         *pcch)
 {
+    /*
     unsigned htype ;
 
     htype = GetFileType(h);
@@ -3898,5 +3907,6 @@ ReadBufFromInput(
     if (htype == FILE_TYPE_CHAR)
         return ReadBufFromConsole(h, pBuf, cch, pcch);
     else
+    */
         return ReadBufFromFile(h, pBuf, cch, pcch);
 }

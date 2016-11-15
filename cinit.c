@@ -24,7 +24,7 @@ BOOLEAN  fEnableExtensions = FALSE; /* - flag to enable extensions */
 BOOLEAN  fDefaultExtensions = TRUE; /* - flag to enable extensions by default */
 unsigned tywild = 0;          /* flag to tell if wild type args    @@5 @J1 */
 int array_size = 0 ;     /* original array size is zero        */
-CPINFO CurrentCPInfo;
+//CPINFO CurrentCPInfo;
 UINT CurrentCP;
 
 WORD    wDefaultColor = 0;      // default is whatever console currently has
@@ -99,8 +99,8 @@ BOOLEAN  fTitleChanged = FALSE;     // title has been changed and needs to be  r
 // used to gate access to ctrlcseen flag between ctrl-c thread
 // and main thread
 //
-CRITICAL_SECTION    CtrlCSection;
-LPCRITICAL_SECTION  lpcritCtrlC;
+//CRITICAL_SECTION    CtrlCSection;
+//LPCRITICAL_SECTION  lpcritCtrlC;
 
 //
 // Used to set and reset ctlcseen flag
@@ -242,8 +242,8 @@ PTCHAR Init()
         // Initialize Critical Section to handle access to
         // flag for control C handling
         //
-        lpcritCtrlC = &CtrlCSection;
-        InitializeCriticalSection(lpcritCtrlC);
+        //lpcritCtrlC = &CtrlCSection;
+        //InitializeCriticalSection(lpcritCtrlC);
         ResetCtrlC();
 
         SetConsoleCtrlHandler(Handler,TRUE);
@@ -256,13 +256,13 @@ PTCHAR Init()
 #ifndef UNICODE
         setbuf(stdout, NULL);           /* Don't buffer output       @@5 */
         setbuf(stderr, NULL);                                     /* @@5 */
-        _setmode(1, O_BINARY);        /* Set output to text mode   @@5 */
-        _setmode(2, O_BINARY);                                  /* @@5 */
+        //_setmode(1, O_BINARY);        /* Set output to text mode   @@5 */
+        //_setmode(2, O_BINARY);                                  /* @@5 */
 #endif
 
         CmdEnv.handle = GetEnvironmentStrings();
 
-        GetRegistryValues();
+        //GetRegistryValues();
 
         mystrcpy(TmpBuf, GetCommandLine());
         LexCopy( TmpBuf, TmpBuf, mystrlen( TmpBuf ) );  /* convert dbcs spaces */
@@ -328,7 +328,7 @@ PTCHAR Init()
         // in the init code for safety - the Dir command calls it before
         // each dir is executed, because chcp may have been executed.
         //
-        GetCPInfo((CurrentCP=GetConsoleOutputCP()), &CurrentCPInfo);
+        //GetCPInfo((CurrentCP=GetConsoleOutputCP()), &CurrentCPInfo);
 
         InitLocale();
 
@@ -351,9 +351,11 @@ PTCHAR Init()
                     }
                 }
 #endif // WIN95_CMD
+                /*
                 if (wDefaultColor) {
                     SetColor( wDefaultColor );
                 }
+                */
             }
         }
 
@@ -385,7 +387,7 @@ PTCHAR Init()
         return(comline) ;
 }
 
-
+/*
 BOOL GetRegistryValues(void)
 {
     long rc;
@@ -459,6 +461,7 @@ BOOL GetRegistryValues(void)
 
     return TRUE;
 }
+*/
 
 /***    CheckSwitches - process Command's switches
  *
@@ -804,18 +807,18 @@ void SetUpEnvironment(void)
 VOID
 ResetCtrlC() {
 
-    EnterCriticalSection(lpcritCtrlC);
+    //EnterCriticalSection(lpcritCtrlC);
     CtrlCSeen = FALSE;
-    LeaveCriticalSection(lpcritCtrlC);
+    //LeaveCriticalSection(lpcritCtrlC);
 
 }
 
 VOID
 SetCtrlC() {
 
-    EnterCriticalSection(lpcritCtrlC);
+    //EnterCriticalSection(lpcritCtrlC);
     CtrlCSeen = TRUE;
-    LeaveCriticalSection(lpcritCtrlC);
+    //LeaveCriticalSection(lpcritCtrlC);
 
 }
 

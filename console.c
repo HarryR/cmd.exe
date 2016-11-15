@@ -5,7 +5,7 @@
 //
 extern TCHAR CrLf[];
 extern unsigned msglen;
-extern CPINFO CurrentCPInfo;
+//extern CPINFO CurrentCPInfo;
 
 void FreeStr( IN  PBYTE   pbFree );
 
@@ -55,7 +55,7 @@ Return Value:
 {
 
     PSCREEN pscr;
-    CONSOLE_SCREEN_BUFFER_INFO ConInfo;
+    //CONSOLE_SCREEN_BUFFER_INFO ConInfo;
     ULONG cbMaxBuff;
 
     pscr = (PSCREEN)gmkstr(sizeof(SCREEN));
@@ -64,6 +64,7 @@ Return Value:
 
         pscr->hndScreen = CRTTONT(STDOUT);
 
+        /*
         if (!GetConsoleScreenBufferInfo(pscr->hndScreen,&ConInfo)) {
 
             // must be a device but not console (maybe NUL)
@@ -71,14 +72,14 @@ Return Value:
             pscr->hndScreen = NULL;
 
         }
-
+        */
     }
-
+    /*
     if (GetConsoleScreenBufferInfo( pscr->hndScreen, &ConInfo)) {
         cbMaxBuff = (ConInfo.dwSize.X + _tcslen(CrLf)) < MAXCBMSGBUFFER ? MAXCBMSGBUFFER : (ConInfo.dwSize.X + _tcslen(CrLf));
-    } else {
+    } else {*/
         cbMaxBuff = MAXCBMSGBUFFER + _tcslen(CrLf);
-    }
+    /*}*/
 
     //
     // allocate enough to hold a buffer plus line termination.
@@ -192,6 +193,7 @@ Return Value:
 			  &arglist
 			 );
 
+    /*
     if (cbMsg == 0) {
         if (NtDllHandle == NULL) {
             NtDllHandle = GetModuleHandle( TEXT("NTDLL") );
@@ -205,7 +207,8 @@ Return Value:
 			      cbMsgBuf,
 			      &arglist
 			     );
-}
+    }
+    */
 
     va_end(arglist);
 
@@ -793,12 +796,12 @@ SetColRow(
 
 {
 
-    CONSOLE_SCREEN_BUFFER_INFO ConInfo;
+    //CONSOLE_SCREEN_BUFFER_INFO ConInfo;
     ULONG   crowMax, ccolMax;
 
     crowMax = 25;
     ccolMax = 80;
-
+    /*
     if (pscr->hndScreen) {
 
         //
@@ -819,7 +822,7 @@ SetColRow(
 
         }
 
-    }
+    }*/
     pscr->crowMax = crowMax;
     pscr->ccolMax = ccolMax;
 
@@ -887,12 +890,15 @@ GetNumRows(
 
 BOOL IsFullWidth(WCHAR wch)
 {
+    return FALSE;
+    /*
     if (CurrentCPInfo.MaxCharSize == 1)
 	return FALSE;
     if (wch <= 0x007f || (wch >= 0xff60 && wch <= 0xff9f))
         return(FALSE);	// Half width.
     else
         return(TRUE);	// Full width.
+    */
 }
 
 
