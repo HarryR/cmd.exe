@@ -130,6 +130,7 @@ unsigned int flgwd;
 
 int FileIsDevice( CRTHANDLE fh )
 {
+    /*
         HANDLE hFile;
         DWORD dwMode;
         unsigned htype ;
@@ -145,7 +146,7 @@ int FileIsDevice( CRTHANDLE fh )
             // passed handle is NOT a CON handle or is a CON input handle or
             // is a CON output handle.
             //
-/*#ifndef DOSWIN32
+#ifndef DOSWIN32
             switch( fh ) {
                 case STDIN:
                     hFile = GetStdHandle(STD_INPUT_HANDLE);
@@ -157,7 +158,7 @@ int FileIsDevice( CRTHANDLE fh )
                     hFile = GetStdHandle(STD_ERROR_HANDLE);
                     break;
                 }
-#endif*/
+#endif
             if (GetConsoleMode(hFile,&dwMode)) {
                 if (dwMode & (ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT | ENABLE_ECHO_INPUT)) {
                     flgwd = 1;
@@ -175,20 +176,26 @@ int FileIsDevice( CRTHANDLE fh )
             flgwd = 0;
             return FALSE;
         }
+    */
+    return FALSE;
 }
 
 int FileIsPipe( CRTHANDLE fh )
 {
+    /*
         unsigned htype ;
 
         htype = GetFileType( CRTTONT(fh) );
         htype &= ~FILE_TYPE_REMOTE;
         flgwd = 0;
-        return( htype == FILE_TYPE_PIPE ) ; /* @@4 */
+        return( htype == FILE_TYPE_PIPE ) ; // @@4
+    */
+    return FALSE;
 }
 
 int FileIsRemote( LPTSTR FileName )
 {
+    /*
     LPTSTR p;
     TCHAR Drive[MAX_PATH*2];
 
@@ -198,12 +205,14 @@ int FileIsRemote( LPTSTR FileName )
             return TRUE;
         }
     }
+    */
 
     return FALSE;
 }
 
 int FileIsConsole(CRTHANDLE fh)
 {
+/*
     unsigned htype ;
     DWORD    dwMode;
     HANDLE   hFile;
@@ -213,7 +222,6 @@ int FileIsConsole(CRTHANDLE fh)
     htype &= ~FILE_TYPE_REMOTE;
 
     if ( htype == FILE_TYPE_CHAR ) {
-/*
 #ifndef DOSWIN32
         switch( fh ) {
             case STDIN:
@@ -226,13 +234,15 @@ int FileIsConsole(CRTHANDLE fh)
                 hFile = GetStdHandle(STD_ERROR_HANDLE);
                 break;
         }
-#endif*/
+#endif
         if (GetConsoleMode(hFile,&dwMode)) {
             return TRUE;
         }
     }
 
     return FALSE;
+*/
+    return isatty(fileno(fh));
 }
 
 

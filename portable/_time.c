@@ -188,3 +188,9 @@ void WINAPI GetSystemTime(
 ) {
 	GetLocalTime(lpSystemTime);
 }
+
+BOOL WINAPI SetLocalTime(
+  _In_ const SYSTEMTIME *lpSystemTime
+) {
+  return FALSE;
+}

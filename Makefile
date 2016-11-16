@@ -1,8 +1,9 @@
-CFLAGS = -Iportable -I.
+CFLAGS = -Iportable -I. -ggdb -O0
 
 SOURCES=portable/compat.c \
 	portable/_locale.c \
 	portable/_time.c \
+	portable/_memory.c \
 	portable/_ltoa.c \
 	portable/_file.c \
 	cbatch.c \

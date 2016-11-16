@@ -1233,7 +1233,7 @@ Return Value:
 
         if ((rc == SUCCESS) && (Vsn)) {
 
-            wsprintf(szT,Fmt26,(Vsn[0] & 0xffff0000)>>16, (Vsn[0] & 0xffff) );
+            sprintf(szT,Fmt26,(Vsn[0] & 0xffff0000)>>16, (Vsn[0] & 0xffff) );
             rc = WriteMsgString(pscr, MSG_DR_VOL_SERIAL, ONEARG, szT);
         }
     }

@@ -19,6 +19,7 @@
 
 #define CONST const
 
+#define O_BINARY 0
 #define _O_APPEND O_APPEND
 #define _O_BINARY O_BINARY
 
@@ -31,7 +32,7 @@
 // See: https://msdn.microsoft.com/en-gb/library/windows/desktop/aa383751(v=vs.85).aspx
 typedef unsigned char BYTE;
 typedef unsigned char *PBYTE;
-typedef char TCHAR;
+typedef char TCHAR, *LPTCH;
 typedef char CHAR;
 typedef char CCHAR;
 typedef wchar_t WCHAR;
@@ -57,8 +58,8 @@ typedef BOOL* LPBOOL;
 typedef uint32_t DWORD;
 typedef DWORD *LPDWORD;
 typedef int64_t LONGLONG;
-typedef PVOID HANDLE;
-typedef HANDLE HINSTANCE;
+typedef PVOID HANDLE, *PHANDLE, *LPHANDLE;
+typedef HANDLE HINSTANCE, HMODULE;
 typedef HANDLE HWND;
 typedef HANDLE* PHANDLE;
 typedef HANDLE HKEY;
@@ -196,26 +197,6 @@ typedef struct _SYSTEMTIME {
   WORD wMilliseconds;
 } SYSTEMTIME, *PSYSTEMTIME, *LPSYSTEMTIME;
 
-typedef struct _MEMORY_BASIC_INFORMATION {
-  PVOID  BaseAddress;
-  PVOID  AllocationBase;
-  DWORD  AllocationProtect;
-  SIZE_T RegionSize;
-  DWORD  State;
-  DWORD  Protect;
-  DWORD  Type;
-} MEMORY_BASIC_INFORMATION, *PMEMORY_BASIC_INFORMATION;
-
-#define MEM_COMMIT 0x00001000
-#define MEM_RESERVE 0x00002000
-#define MEM_RESET 0x00080000
-#define MEM_RELEASE 0x8000
-
-// https://msdn.microsoft.com/en-us/library/windows/desktop/aa366786(v=vs.85).aspx
-#define PAGE_NOACCESS 0x01
-#define PAGE_READONLY 0x02
-#define PAGE_READWRITE 0x04
-
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724251(v=vs.85).aspx
 #define DUPLICATE_CLOSE_SOURCE 0x00000001
 
@@ -235,8 +216,17 @@ typedef DWORD (WINAPI *LPPROGRESS_ROUTINE)(
     	 LPVOID        lpData
 );
 
+DWORD WINAPI GetLastError(void);
+void WINAPI SetLastError(DWORD dwErrCode);
+
+LPTSTR WINAPI GetCommandLine(void);
+VOID WINAPI SetCommandLine(int argc, char **argv);
+DWORD WINAPI GetVersion(void);
+
+char *strtolower(char *buf);
 char* strtoupper(char* s);
 
+#define _tcslwr strtolower
 #define lstrcmpi strcasecmp
 #define _tcsstr strstr
 #define _tcsrchr strrchr
@@ -265,8 +255,6 @@ char* strtoupper(char* s);
 
 #define _getch getchar
 
-#define O_BINARY 0
-
 #define max(x,y) ((x)>(y)?(x):(y))
 #define min(x,y) ((x)<(y)?(x):(y))
 
@@ -274,9 +262,14 @@ char* strtoupper(char* s);
 #define DBG_UNREFERENCED_PARAMETER(p)      ((p)=(p))
 #define DBG_UNREFERENCED_LOCAL_VARIABLE(p) ((p)=(p))
 
-#define IN
 #define _In_
+#define _In_opt_
+#define _Inout_opt_
+#define _Inout_
+#define _Reserved_
 #define _Out_
+#define _Out_opt_
+#define IN
 #define OUT
 #define OPTIONAL
 
@@ -288,62 +281,25 @@ char* strtoupper(char* s);
 void _ultoa(unsigned long value, char* string, unsigned char radix);
 void _ltoa(long value, char* string, unsigned char radix);
 
-HANDLE WINAPI GetProcessHeap(void);
-
-#define HEAP_ZERO_MEMORY 0x00000008
-
-BOOL WINAPI HeapFree(
-  HANDLE hHeap,
-  DWORD  dwFlags,
-  LPVOID lpMem
+BOOL WINAPI GetConsoleMode(
+  _In_  FILE*  hConsoleHandle,
+  _Out_ LPDWORD lpMode
 );
 
-LPVOID WINAPI HeapAlloc(
-  HANDLE hHeap,
-  DWORD  dwFlags,
-  size_t dwBytes
+DWORD WINAPI GetConsoleTitle(
+  _Out_ LPTSTR lpConsoleTitle,
+  _In_  DWORD  nSize
 );
 
-LPVOID WINAPI HeapReAlloc(
-  HANDLE hHeap,
-  DWORD  dwFlags,
-  LPVOID lpMem,
-  size_t dwBytes
+BOOL WINAPI SetConsoleTitle(
+  _In_ LPCTSTR lpConsoleTitle
 );
 
-#define FILE_BEGIN SEEK_SET
-#define FILE_CURRENT SEEK_CUR
-#define FILE_END SEEK_END
+void WINAPI DebugBreak(void);
 
-BOOL WINAPI ReadFile(
-  FILE         *hFile,
-  LPVOID       lpBuffer,
-  DWORD        nNumberOfBytesToRead,
-  LPDWORD      lpNumberOfBytesRead,
-  LPVOID lpOverlapped
-);
-
-BOOL DeleteFile(LPCTSTR lpFileName);
-
-BOOL WINAPI CloseFile(
-  FILE *hFile
-);
-
-
-DWORD WINAPI GetFileSize(
-  FILE  *hFile,
-  LPDWORD lpFileSizeHigh
-);
-
-// https://msdn.microsoft.com/en-us/library/windows/desktop/aa365541(v=vs.85).aspx
-DWORD WINAPI SetFilePointer(
-  FILE   *hFile,
-  LONG   lDistanceToMove,
-  PLONG  lpDistanceToMoveHigh,
-  DWORD  dwMoveMethod
-);
 
 #define INVALID_HANDLE_VALUE NULL
+#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx
 #define NO_ERROR 0
@@ -390,6 +346,7 @@ DWORD WINAPI SetFilePointer(
 #define ERROR_BAD_EXE_FORMAT 193
 #define ERROR_INVALID_MINALLOCSIZE 195
 #define ERROR_INFLOOP_IN_RELOC_CHAIN 202
+#define ERROR_ENVVAR_NOT_FOUND 203
 #define ERROR_FILENAME_EXCED_RANGE 206
 #define ERROR_EXE_MACHINE_TYPE_MISMATCH 216
 #define ERROR_MORE_DATA 234
@@ -531,7 +488,92 @@ DWORD WINAPI SetFilePointer(
 #define FIELD_OFFSET(type, field) ((LONG)(INT_PTR)&(((type *)0)->field))
 #endif
 
+DWORD WINAPI GetEnvironmentVariable(
+  LPCTSTR lpName,
+  LPTSTR  lpBuffer,
+  DWORD   nSize
+);
+
+DWORD WINAPI GetModuleFileName(
+  _In_opt_ HMODULE hModule,
+  _Out_    LPTSTR  lpFilename,
+  _In_     DWORD   nSize
+);
+
+UINT WINAPI SetErrorMode(
+  _In_ UINT uMode
+);
+
+BOOL WINAPI SetEnvironmentVariable(
+  _In_     LPCTSTR lpName,
+  _In_opt_ LPCTSTR lpValue
+);
+
+BOOL WINAPI CloseHandle(
+  _In_ HANDLE hObject
+);
+
+BOOL WINAPI CreateProcess(
+  _In_opt_    LPCTSTR               lpApplicationName,
+  _Inout_opt_ LPTSTR                lpCommandLine,
+  _In_opt_    LPSECURITY_ATTRIBUTES lpProcessAttributes,
+  _In_opt_    LPSECURITY_ATTRIBUTES lpThreadAttributes,
+  _In_        BOOL                  bInheritHandles,
+  _In_        DWORD                 dwCreationFlags,
+  _In_opt_    LPVOID                lpEnvironment,
+  _In_opt_    LPCTSTR               lpCurrentDirectory,
+  _In_        LPSTARTUPINFO         lpStartupInfo,
+  _Out_       LPPROCESS_INFORMATION lpProcessInformation
+);
+
+BOOL WINAPI GetExitCodeProcess(
+  _In_  HANDLE  hProcess,
+  _Out_ LPDWORD lpExitCode
+);
+
+DWORD WINAPI WaitForSingleObject(
+  _In_ HANDLE hHandle,
+  _In_ DWORD  dwMilliseconds
+);
+
+BOOL WINAPI DuplicateHandle(
+  _In_  HANDLE   hSourceProcessHandle,
+  _In_  HANDLE   hSourceHandle,
+  _In_  HANDLE   hTargetProcessHandle,
+  _Out_ LPHANDLE lpTargetHandle,
+  _In_  DWORD    dwDesiredAccess,
+  _In_  BOOL     bInheritHandle,
+  _In_  DWORD    dwOptions
+);
+
+BOOL ShellExecuteEx(
+  _Inout_ SHELLEXECUTEINFO *pExecInfo
+);
+
+BOOL WINAPI TerminateProcess(
+  _In_ HANDLE hProcess,
+  _In_ UINT   uExitCode
+);
+
+SIZE_T WINAPI VirtualQuery(
+  _In_opt_ LPCVOID                   lpAddress,
+  _Out_    LPVOID lpBuffer,
+  _In_     SIZE_T                    dwLength
+);
+
+DWORD WINAPI FormatMessage(
+  _In_     DWORD   dwFlags,
+  _In_opt_ LPCVOID lpSource,
+  _In_     DWORD   dwMessageId,
+  _In_     DWORD   dwLanguageId,
+  _Out_    LPTSTR  lpBuffer,
+  _In_     DWORD   nSize,
+  _In_opt_ va_list *Arguments
+);
+
 #include "_locale.h"
 #include "_time.h"
+#include "_memory.h"
+#include "_file.h"
 
 #endif

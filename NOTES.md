@@ -1,106 +1,35 @@
-# Porting Method
+# Why?
+
+Because my soul aim in life is to have a Windows NT compatible CMD shell when I login to my Unix boxen. This is my Dark Souls. Previously I used Plan9's `rc`, then Python, then `scsh`. Now it's time for the ultimate level of massochism and technological fuckery. Now, I would have ported VMS's DCL to POSIX, but I couldn't find the source code.
+
+## Porting Method
 
  1. Remove small chunks of code which we know aren't applicaple
  2. Identify and add missing defines / typedefs
  3. Fix minor / trivial compile errors
  4. Implement minor / trivial API stubs (e.g. `HeapFree`, `SetFilePointer`)
  5. Identify APIs which can be easily implemented or replaced
- 6. Rewrite code which has no
+ 6. Implement stubs for other APIs, `abort()` / TRAP them
+ 7. Error handling
+ 8. Rewrite other APIs as necessary
+
+## Troublesome areas
+
+ * SearchPath - translate from Windows `PATH` to POSIX `PATH`
+ * SetConsoleCtrlHandler - replicate with `signal()`
+ * FindFirstFile etc. - replace with `readdir_r`
+ * ShellExecute / DuplicateHandle / CreateProcess / GetExitCodeProcess / TerminateProcess / CloseHandle - process lifecycle, pipes, redirection, general shell stuff
+ * GetEnvironmentStrings - 
+ * FormatMessage - No POSIX equivalent... must be emulated
+ * Console, DOS vs NT vs Win95 vs Sanity. - Can be mostly emulated with readline, ncurses, termcap
 
 ## Cruft Removed
 
  * ChkStack - check the stack usage
  * Copen_Work - Removed, use native open()
- * PrtErr - replaced with strerror
+ * PrtErr - replaced with strerror?
  * InitializeDbcsLeadCharTable
  * ReadBufFromConsole
- * wide chars
+ * wide chars / unicode
  * Win32 console
 
-## Cruft to Add
-
- * GetFullPathName - realpath
- * GetLastError ?
- * MoveFile - https://msdn.microsoft.com/en-us/library/windows/desktop/aa365239(v=vs.85).aspx
- * FindFirstFile - https://msdn.microsoft.com/en-us/library/windows/desktop/aa364418(v=vs.85).aspx
- * FindNextFile
- * SetLastError
-CloseHandle
-CopyFile
-CreateDirectory
-CreateFile
-CreateProcess
-DebugBreak
-DuplicateHandle
-FindClose
-FindFirstFile
-FindNextFile
-FlushConsoleInputBuffer
-FlushFileBuffers
-FormatMessage
-GetBinaryType
-GetCommandLine
-GetConsoleMode
-GetConsoleTitle
-GetCurrentDirectory
-GetCurrentThreadId
-GetDiskFreeSpace
-GetDriveType
-GetEnvironmentStrings
-GetEnvironmentVariable
-GetExitCodeProcess
-GetFileAttributes
-GetFileType
-GetFullPathName
-GetLastError
-GetModuleFileName
-GetModuleHandle
-GetProcAddress
-GetProcessSubsystemType
-GetProcessWindowStation
-GetStdHandle
-GetThreadDesktop
-GetUserObjectInformation
-GetVersion
-GetVolumeInformation
-GetWindowsDirectory
-HeapSize
-MoveFile
-MultiByteToWideChar
-ReadBufFromConsole
-RemoveDirectory
-SearchPath
-SetColor
-SetConsoleCtrlHandler
-SetConsoleMode
-SetConsoleTitle
-SetCurrentDirectory
-SetEnvironmentVariable
-SetErrorMode
-SetFileApisToOEM
-SetFileAttributes
-SetFileTime
-SetLastError
-SetLocalTime
-ShellExecuteEx
-TerminateProcess
-UInt32x32To64
-VirtualAlloc
-VirtualFree
-VirtualQuery
-WNetCancelConnection2
-WNetGetConnection
-WaitForSingleObject
-WriteConsole
-WriteFile
-_close
-_dup
-_dup2
-_open_osfhandle
-_pipe
-_setmode
-_tcslwr
-_tell
-_vsntprintf
-lstrcmpi
-wsprintf

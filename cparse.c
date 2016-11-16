@@ -268,7 +268,7 @@ DuRd(struct node *n)
 
 struct node *Parser(dfvalue, dpvalue, fsarg)
 unsigned dfvalue ;
-int dpvalue ;
+void* dpvalue ;
 int fsarg ;
 {
         struct node *n ;       /* Root of the parse tree */

@@ -384,7 +384,7 @@ ExecPgm(
         StartupInfo.wShowWindow = SW_SHOWNORMAL;
 
         // Pass current Desktop to a new process.
-
+        /*
         hwinsta = GetProcessWindowStation();
         GetUserObjectInformation( hwinsta, UOI_NAME, NULL, 0, &cbWinsta );
 
@@ -403,7 +403,7 @@ ExecPgm(
                 }
             }
         }
-
+        */
         b = CreateProcess( fnptr,
                            argptr,
                            (LPSECURITY_ATTRIBUTES) NULL,
@@ -1622,6 +1622,14 @@ TCHAR *opencmd ;
     return rc;
 }
 */
+
+WORD
+GetProcessSubsystemType(
+    HANDLE hProcess
+    )
+{
+    return 0; // IMAGE_SUBSYSTEM_UNKNOWN
+}
 
 /*
 typedef

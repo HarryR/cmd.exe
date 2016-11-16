@@ -158,7 +158,7 @@ extern int ChkStack (PVOID pFixed, STACK_USE *pStackUse);
 
 int
 _CRTAPI1
-main()
+main(int argc, char **argv)
 
 /*++
 
@@ -245,11 +245,13 @@ Return Value:
 
     //InitializeDbcsLeadCharTable( );
 
+    SetCommandLine( argc, argv );
+
     //
     // Set base APIs to operate in OEM mode
     //
 #ifndef UNICODE
-    SetFileApisToOEM();
+    //SetFileApisToOEM();
 #endif  /* Unicode */
 
     SetTEBLangID();
@@ -274,7 +276,7 @@ Return Value:
 
             DEBUG((MNGRP, MNLVL, "MAIN: Single command mode on `%ws'", pszCmdLine)) ;
 
-            if ((pnodeCmdTree = Parser(READSTRING, (int)pszCmdLine, DCount)) == (struct node *) PARSERROR)
+            if ((pnodeCmdTree = Parser(READSTRING, pszCmdLine, DCount)) == (struct node *) PARSERROR)
                 CMDexit(MAINERROR) ;
 
             if (pnodeCmdTree == (struct node *) EOF)

@@ -317,7 +317,7 @@ PopStr ()
             szLocalName[1] = COLON;
             szLocalName[2] = NULLC;
             StrStackNetDriveCreated[StrStackDepth] = NULLC;
-            WNetCancelConnection2(szLocalName, 0, TRUE);
+            //WNetCancelConnection2(szLocalName, 0, TRUE);
         }
         StrStack[StrStackDepth] = NULL;
         return( pszString );

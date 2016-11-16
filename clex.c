@@ -126,7 +126,7 @@ PROMPT_ENTRY PromptTable[] = {
        { TEXT('C'),PLITFLAG, LPOP   },
        { TEXT('F'),PLITFLAG, RPOP   },
        { TEXT('+'),PDPTFLAG, NULLC },
-       { TEXT('M'),PNETFLAG, NULLC },
+//       { TEXT('M'),PNETFLAG, NULLC },
        { NULLC,PNULLFLAG, NULLC}};
 
 /***    InitLex - initialize the lexer's global variables
@@ -144,7 +144,7 @@ PROMPT_ENTRY PromptTable[] = {
 
 void InitLex(dfvalue, dpvalue)
 unsigned dfvalue ;
-int dpvalue ;
+void* dpvalue ;
 {
         DataFlag = dfvalue ;
         DataPtr = dpvalue ;
@@ -1063,7 +1063,7 @@ Return Value:
                             break ;
 
                         case PDPTFLAG:
-                        case PNETFLAG:
+                        //case PNETFLAG:
                             //
                             // If extensions are enabled, then two new prompt characters
                             //
@@ -1079,7 +1079,7 @@ Return Value:
                                     nUsed = _sntprintf( s, nLeft, TEXT("%.*s"), GetDirStackDepth(), TEXT("+++++++++++++++++++++++++++++++++"));
                                     s += nUsed;
                                     nLeft -= nUsed;
-                                }
+                                }/*
                                 else {
                                     TCHAR CurDrive[4];
                                     TCHAR NetPath[MAX_PATH];
@@ -1109,7 +1109,7 @@ Return Value:
                                         nLeft -= nUsed;
                                         break;
                                     }
-                                }
+                                }*/
                             }
                             break;
 
@@ -1393,7 +1393,7 @@ TCHAR delim ;
         w1 = GetEnvVar(str) ;           /* w1 == NULL or env variable      */
         if (fEnableExtensions && w1 == NULL) {
             if (!_tcsicmp(str, ErrStr))
-                wsprintf( w1 = LastRetCodeStr, TEXT("%d"), LastRetCode );
+                sprintf( w1 = LastRetCodeStr, TEXT("%d"), LastRetCode );
             else
             if (!_tcsicmp(str, TEXT("CMDCMDLINE")))
                 w1 = GetCommandLine();

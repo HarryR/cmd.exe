@@ -667,7 +667,7 @@ Start(
         }
 
     // Pass current Desktop to a new process.
-
+    /*
     hwinsta = GetProcessWindowStation();
     GetUserObjectInformation( hwinsta, UOI_NAME, NULL, 0, &cbWinsta );
 
@@ -686,7 +686,7 @@ Start(
             }
         }
     }
-
+    */
     if (fNeedExpl) {
         b = FALSE;
     } else {

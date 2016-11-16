@@ -2381,6 +2381,7 @@ int SubFor(struct node *n, BOOL bFirstLoop)
 /*  M017 ends   */
                         return(SUCCESS) ;
         } ;
+        return 0;
 }
 
 
@@ -3567,7 +3568,7 @@ TCHAR *fname ;
         DEBUG((BPGRP,OTLVL,"CALL: Parsing %ws",fname)) ;
 
         ColonIsToken = 1;
-        c=Parser(READSTRING, (int)aptr, i);
+        c=Parser(READSTRING, aptr, i);
         ColonIsToken = 0;
 
         if (c == (struct node *) PARSERROR) {
@@ -3721,6 +3722,16 @@ ReadBufFromFile(
 #endif
     *pcch = cch;
     return cch;
+}
+
+BOOL
+ReadBufFromConsole(
+    FILE*      h,
+    TCHAR*      pBuf,
+    int         cch,
+    int         *pcch)
+{
+    return ReadBufFromFile(h, pBuf, cch, pcch);
 }
 
 /*
@@ -3908,5 +3919,5 @@ ReadBufFromInput(
         return ReadBufFromConsole(h, pBuf, cch, pcch);
     else
     */
-        return ReadBufFromFile(h, pBuf, cch, pcch);
+    return ReadBufFromFile(h, pBuf, cch, pcch);
 }

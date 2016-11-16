@@ -317,7 +317,7 @@ FindMsg(unsigned MsgNum, PTCHAR NullArg, unsigned NumOfArgs, va_list *arglist)
                                sizeof(MsgBuf) / sizeof(TCHAR),
                                NULL
                              );
-        if (msglen == 0) {
+        /*if (msglen == 0) {
 #if DBG
             error = GetLastError();
             DEBUG((CTGRP, COLVL, "FindMsg: FormatMessage #1 error %d",error)) ;
@@ -334,7 +334,7 @@ FindMsg(unsigned MsgNum, PTCHAR NullArg, unsigned NumOfArgs, va_list *arglist)
                                    sizeof(MsgBuf) / sizeof(TCHAR),
                                    NULL
                                  );
-        }
+        }*/
     }
 
     if (msglen == 0) {
@@ -543,7 +543,7 @@ PTCHAR argstr1(format, arg)
 TCHAR *format;
 unsigned long arg;
 {
-        wsprintf(&TmpBuf[MAX_PATH], format, arg);                      /* M020    */
+        sprintf(&TmpBuf[MAX_PATH], format, arg);                      /* M020    */
         return(&TmpBuf[MAX_PATH]);
 }
 
@@ -551,7 +551,7 @@ TCHAR * argstr2(format, arg)
 TCHAR *format;
 unsigned long arg;
 {
-        wsprintf(&TmpBuf[MAX_PATH*2], format, arg);                      /* M020    */
+        sprintf(&TmpBuf[MAX_PATH*2], format, arg);                      /* M020    */
         return(&TmpBuf[MAX_PATH*2]);
 }
 
@@ -1493,7 +1493,7 @@ unsigned dow;
 /*      CreateFile  - open a file with ability for EA processing     */
 /*                                                                   */
 /*********************** END OF SPECIFICATIONS ***********************/
-
+/*
 CRTHANDLE
 Copen_Work2(fn, flags, fShareMode, FSwitch)
 TCHAR *fn ;                     // filename                        
@@ -1559,16 +1559,17 @@ unsigned int flags, fShareMode, FSwitch ;  // flags and special case flags
             DosErr = GetLastError();
             DEBUG((CTGRP,COLVL, "COPEN: CreateFile ret'd %d",DosErr)) ;
             if (DosErr==ERROR_OPEN_FAILED) {
-                 DosErr=ERROR_FILE_NOT_FOUND;   /* change to another error */
+                 DosErr=ERROR_FILE_NOT_FOUND;   // change to another error 
             }
             rcode = BADHANDLE;
         }
         else {
             rcode = _open_osfhandle((long)handl, _O_APPEND);
-        }                       /*                                 */
-    }                           /*                                 */
-    return(rcode ) ;            /* return handle to caller         */
+        }                       //                                 
+    }                           //                                 
+    return(rcode ) ;            // return handle to caller         
 }
+*/
 
 /********************** START OF SPECIFICATIONS **********************/
 /* SUBROUTINE NAME: Copen2                                           */
@@ -1673,15 +1674,18 @@ Copen_Copy2(fn, flags)
 TCHAR *fn;                      /* file name                       */
 unsigned int flags ;                    /* open flags                      */
 {
-    return(Copen_Work2(fn, flags, FILE_SHARE_READ | FILE_SHARE_WRITE, TRUE));
+    //return(Copen_Work2(fn, flags, FILE_SHARE_READ | FILE_SHARE_WRITE, TRUE));
+    return Copen2(fn, flags);
 }
 
 CRTHANDLE
 Copen_Copy3(fn)
-TCHAR *fn;                      /* file name                       */
+TCHAR *fn;                      // file name                       
 {
-    HANDLE      handl ;         /* Handle ret'd                    */
-    CRTHANDLE   rcode;          /* return code                     */
+    return Copen2(fn, O_RDWR);
+/*
+    HANDLE      handl ;         // Handle ret'd                    
+    CRTHANDLE   rcode;          // return code                     
     SECURITY_ATTRIBUTES sa;
 
     sa.bInheritHandle = TRUE;
@@ -1696,14 +1700,15 @@ TCHAR *fn;                      /* file name                       */
         DosErr = GetLastError();
         DEBUG((CTGRP,COLVL, "COPEN: CreateFile ret'd %d",DosErr)) ;
         if (DosErr==ERROR_OPEN_FAILED) {
-            DosErr=ERROR_FILE_NOT_FOUND;        /* change to another error */
+            DosErr=ERROR_FILE_NOT_FOUND;        // change to another error 
         }
         rcode = BADHANDLE;
     }
     else {
         rcode = _open_osfhandle((long)handl, _O_APPEND);
-    }                   /*                                 */
-    return(rcode ) ;            /* return handle to caller         */
+    }
+    return(rcode ) ;            // return handle to caller
+*/
 }
 
 TCHAR *

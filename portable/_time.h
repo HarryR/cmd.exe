@@ -11,5 +11,8 @@ void GetSystemTimeAsFileTime(LPFILETIME lpSystemTimeAsFileTime);
 void WINAPI GetSystemTime(
   _Out_ LPSYSTEMTIME lpSystemTime
 );
+BOOL WINAPI SetLocalTime(
+  _In_ const SYSTEMTIME *lpSystemTime
+);
 
 #endif

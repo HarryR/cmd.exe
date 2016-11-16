@@ -265,7 +265,7 @@ PTCHAR Init()
         //GetRegistryValues();
 
         mystrcpy(TmpBuf, GetCommandLine());
-        LexCopy( TmpBuf, TmpBuf, mystrlen( TmpBuf ) );  /* convert dbcs spaces */
+        //LexCopy( TmpBuf, TmpBuf, mystrlen( TmpBuf ) );  /* convert dbcs spaces */
 
 #if DBG                         /* Set debug group and level words */
 
@@ -374,6 +374,7 @@ PTCHAR Init()
 
         DEBUG((INGRP, RSLVL, "INIT: Returning now.")) ;
 
+#ifndef WIN95_CMD
         lpCopyFileExW = (LPCOPYFILEEX_ROUTINE)
                         GetProcAddress( GetModuleHandle( TEXT("KERNEL32.DLL") ),
                                         "CopyFileExW"
@@ -383,7 +384,7 @@ PTCHAR Init()
                              GetProcAddress( GetModuleHandle( TEXT("KERNEL32.DLL") ),
                                              "IsDebuggerPresent"
                                            );
-
+#endif // WIN95_CMD
         return(comline) ;
 }
 
@@ -731,13 +732,15 @@ void SetUpEnvironment(void)
     TCHAR *cds ;            // Command directory string
     TCHAR *nptr ;                    // Temp cmd name ptr
     TCHAR *eptr ;                    // Temp cmd name ptr
-    MEMORY_BASIC_INFORMATION MemInfo;
 
+    /*
+    MEMORY_BASIC_INFORMATION MemInfo;
 
     eptr = CmdEnv.handle;
     CmdEnv.cursize = GetEnvCb( eptr );
     VirtualQuery( CmdEnv.handle, &MemInfo, sizeof( MemInfo ));
     CmdEnv.maxsize = MemInfo.RegionSize;
+    */
 
     if (!(cds = mkstr(MAX_PATH*sizeof(TCHAR)))) {
         PutStdErr(ERROR_NOT_ENOUGH_MEMORY, NOARGS);
@@ -794,13 +797,13 @@ void SetUpEnvironment(void)
     }
 
     ChangeDir(CurDrvDir);
-
+    /*
     penvOrig = CopyEnv();
     if (penvOrig) {
         OrigEnv = *penvOrig;
         penvOrig = &OrigEnv;
     }
-
+    */
 }
 
 

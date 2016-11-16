@@ -248,6 +248,7 @@ int TyWork(TCHAR *fspec) {
             brcopy = bytesread / sizeof(TCHAR);
         } else
 #endif // UNICODE
+        /*
         if (FileIsConsole(STDOUT)
 #ifdef UNICODE
               || fOutputUnicode
@@ -291,9 +292,9 @@ int TyWork(TCHAR *fspec) {
                 brcopy = TypeBufSize*2;
             }
             bptr = TypeBufW;
-        } else {
+        } else { */
             brcopy = bytesread;
-        }
+        //}
 
         if (first_read) {
             if (tywild)
@@ -588,7 +589,7 @@ TCHAR *drvspec ;
                           argstr1( TEXT("%c"), (unsigned long)c)) ;
            }
 /* @@5 */  if (b) {           // FIX, FIX
-              wsprintf(Tmpbuffer, Fmt26,
+              sprintf(Tmpbuffer, Fmt26,
                       (Vsn[0] & 0xffff0000)>>16, (Vsn[0] & 0xffff));
               PutStdOut(MSG_DR_VOL_SERIAL, ONEARG, Tmpbuffer);
 /* @@5 */  }
