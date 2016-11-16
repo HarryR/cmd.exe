@@ -928,9 +928,8 @@ SetList(
  *      It is assumed that i is valid.
  *
  */
-int
- (*GetFuncPtr(i))(struct cmdnode *)
-int i ;
+CmdFuncPtr
+GetFuncPtr(int i)
 {
         return(JumpTable[i].func) ;
 }

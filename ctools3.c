@@ -49,7 +49,7 @@ unsigned sizpath;
  TCHAR *filepart;
  DWORD rv;
 
-/*509*/ mystrcpy(fname, stripit(fname) );
+///*509*/ mystrcpy(fname, stripit(fname) );
 
  if (*fname == NULLC)
    {

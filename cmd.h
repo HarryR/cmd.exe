@@ -1028,7 +1028,8 @@ extern BOOLEAN AnyDbcsLeadChars;
     ( (str) ? _tcslen( str ) : ( 0 ))
 
 #define mystrcpy( s1, s2 )                  \
-    ( ((s1) && (s2)) ? _tcscpy( s1, s2 ) : ( NULL ))
+    ( s1 == s2 ? s1 : \
+    	( ((s1) && (s2)) ? _tcscpy( s1, s2 ) : ( NULL )) )
 
 #define mystrcat( s1, s2 )                  \
     ( ((s1) && (s2)) ? _tcscat( s1, s2 ) : ( NULL ))

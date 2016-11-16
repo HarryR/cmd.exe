@@ -574,7 +574,8 @@ Return Value:
         // otherwise locate file load and execute
         //
         if (pnodeCmdTree->type != CMDTYP) {
-            comretcode = (*GetFuncPtr(pnodeCmdTree->type))((struct cmdnode *)pnodeCmdTree) ;
+            CmdFuncPtr pnodeCmdFunc = GetFuncPtr(pnodeCmdTree->type);
+            comretcode = pnodeCmdFunc((struct cmdnode *)pnodeCmdTree) ;
         } else {
             comretcode = FindFixAndRun((struct cmdnode *)pnodeCmdTree) ;
         }

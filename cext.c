@@ -877,7 +877,7 @@ TCHAR *loc ;
                 }
 
                 mystrcat(loc, fname) ;
-                mystrcpy(loc, stripit(loc) );
+                //mystrcpy(loc, stripit(loc) );
                 dotloc = mystrlen(loc) ;
 
                 DEBUG((DBENV, DBENVSCAN, "SearchForExecutable: PATH:%ws",loc));

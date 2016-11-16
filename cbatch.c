@@ -3731,7 +3731,8 @@ ReadBufFromConsole(
     int         cch,
     int         *pcch)
 {
-    fgets(pBuf, cch, h);
+    if( NULL == fgets(pBuf, cch, h) )
+        return FALSE;
     *pcch = strlen(pBuf);
     return TRUE;
     //return ReadBufFromFile(h, pBuf, cch, pcch);

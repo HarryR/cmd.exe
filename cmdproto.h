@@ -299,7 +299,8 @@ LoopThroughArgs (
   CRTHANDLE Cdup2( CRTHANDLE , CRTHANDLE );
   int Cclose( CRTHANDLE );
   void SetList( CRTHANDLE );
-  int ( * GetFuncPtr(int ))(struct cmdnode *);
+  typedef int (*CmdFuncPtr)(struct cmdnode *);
+  CmdFuncPtr GetFuncPtr(int );
   int FindCmd(int ,TCHAR   *,TCHAR   *);
   int KillProc(unsigned int, int );
   int WaitProc(unsigned int );
