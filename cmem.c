@@ -44,12 +44,15 @@ MemChk1(
     IN  PDSTACK pdstk
     )
 {
+        return 0;
+        /*
         if (pdstk->cb != HeapSize(GetProcessHeap(), 0, pdstk)) {
             cmd_printf (TEXT("len = %d"), pdstk->cb) ;
                 return(1) ;
         } else {
                 return(0) ;
         } ;
+        */
 }
 
 

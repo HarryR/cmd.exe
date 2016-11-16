@@ -481,10 +481,10 @@ unsigned *lflag ;
 
 TCHAR GetByte()
 {
-        static int saw_dbcs_lead = 0;   /* remember if we're in the middle
-                                           of a double byte character */
-        TCHAR lead;                     /* variables for remember parts of
-                                           double byte characters */
+        static int saw_dbcs_lead = 0;   // remember if we're in the middle
+                                        //   of a double byte character 
+        TCHAR lead;                     // variables for remember parts of
+                                        //   double byte characters 
 
         if (!*LexBufPtr)
                 FillBuf() ;
@@ -492,7 +492,7 @@ TCHAR GetByte()
         DEBUG((PAGRP, BYLVL, "GTTCHAR: byte = %04x", *LexBufPtr)) ;
 
         if (*LexBufPtr == CR && !saw_dbcs_lead) {
-                                        /* M000 - removed file-only test   */
+                                        // M000 - removed file-only test  
                 LexBufPtr++ ;
                 return(GetByte()) ;
         } ;

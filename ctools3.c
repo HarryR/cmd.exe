@@ -177,6 +177,10 @@ int FileIsDevice( CRTHANDLE fh )
             return FALSE;
         }
     */
+    if( fh == STDIN && FileIsConsole(fh) ) {
+        flgwd = 1;
+        return TRUE;
+    }
     return FALSE;
 }
 

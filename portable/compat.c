@@ -56,7 +56,7 @@ LPTSTR WINAPI GetCommandLine(void) {
 
 VOID WINAPI SetCommandLine(int argc, char **argv) {
   int N;
-  for( N = 0; N < argc; N++ ) {
+  for( N = 1; N < argc; N++ ) {
     if( N ) {
       g_cmdline = str_append(g_cmdline, " ");
     }
@@ -254,7 +254,12 @@ DWORD WINAPI FormatMessage(
   _In_     DWORD   nSize,
   _In_opt_ va_list *Arguments
 ) {
-  abort();
-  return 0;
+  snprintf(lpBuffer, nSize, "Message: %d\n", dwMessageId);
+  return strlen(lpBuffer);
 }
 
+void WINAPI OutputDebugStringA(
+  _In_opt_ LPCTSTR lpOutputString
+) {
+  fwrite(lpOutputString, strlen(lpOutputString), 1, stderr);
+}

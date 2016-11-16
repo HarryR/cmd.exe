@@ -969,7 +969,7 @@ TCHAR *sflags ;
 
  for (i=0 ; i <= entries ; i++)                /* search through all entries */
    {
-    if (_tcsicmp(sname,JumpTable[i].name) == 0) /* test for cmd in table @inx */
+    if (JumpTable[i].name && _tcsicmp(sname,JumpTable[i].name) == 0) /* test for cmd in table @inx */
       {                                        /*                            */
        if (!(JumpTable[i].flags & EXTENSCMD) || fEnableExtensions) {
         *sflags = JumpTable[i].flags;          /* M017                       */

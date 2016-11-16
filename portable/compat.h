@@ -250,6 +250,7 @@ char* strtoupper(char* s);
 #define _sntprintf snprintf
 #define _stprintf sprintf
 #define _vsntprintf vsnprintf 
+#define _vsnprintf vsnprintf 
 #define TEXT(x) x
 #define __TEXT(x) x
 
@@ -570,6 +571,11 @@ DWORD WINAPI FormatMessage(
   _In_     DWORD   nSize,
   _In_opt_ va_list *Arguments
 );
+
+void WINAPI OutputDebugStringA(
+  _In_opt_ LPCTSTR lpOutputString
+);
+
 
 #include "_locale.h"
 #include "_time.h"
