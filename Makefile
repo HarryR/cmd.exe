@@ -6,6 +6,7 @@ SOURCES=portable/compat.c \
 	portable/_memory.c \
 	portable/_ltoa.c \
 	portable/_file.c \
+	portable/cmdmsg.c \
 	cbatch.c \
 	cchcp.c \
 	cclock.c \
@@ -49,6 +50,9 @@ all: cmd.exe
 
 cmd.exe: $(OBJECTS)
 	$(CC) -o $@ $+
+
+portable/cmdmsg.c: cmdmsg.mc
+	./parsemsg.py $< > $@
 
 clean:
 	rm -f $(OBJECTS) cmd.exe

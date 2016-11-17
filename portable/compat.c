@@ -254,7 +254,27 @@ DWORD WINAPI FormatMessage(
   _In_     DWORD   nSize,
   _In_opt_ va_list *Arguments
 ) {
-  snprintf(lpBuffer, nSize, "Message: %d\n", dwMessageId);
+  int N = 0;
+  const cmdmsg_t *msg = NULL;
+  while( TRUE ) {
+    msg = &g_cmdmsg[N];
+    if( msg->id == 0 ) {      
+      msg = NULL;
+      break;
+    }
+    
+    if( msg->id == dwMessageId ) {
+      break;
+    }
+    N++;
+  }
+
+  if( msg == NULL ) {
+    snprintf(lpBuffer, nSize, "Message: %d (%x)\n", dwMessageId, dwMessageId);
+  }
+  else {
+    snprintf(lpBuffer, nSize, "%s", msg->data); 
+  }
   return strlen(lpBuffer);
 }
 

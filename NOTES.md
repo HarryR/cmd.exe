@@ -21,7 +21,7 @@ Because my soul aim in life is to have a Windows NT compatible CMD shell when I 
  * ShellExecute / DuplicateHandle / CreateProcess / GetExitCodeProcess / TerminateProcess / CloseHandle - process lifecycle, pipes, redirection, general shell stuff
  * GetEnvironmentStrings - 
  * FormatMessage - No POSIX equivalent... must be emulated
- * Console, DOS vs NT vs Win95 vs Sanity. - Can be mostly emulated with readline, ncurses, termcap
+ * Console, DOS vs NT vs Win95 vs Sanity. - Can be mostly emulated with readline, ncurses, termcap - reading line at a time vs char at a time vs N-sized buf at a time
 
 ## Cruft Removed
 

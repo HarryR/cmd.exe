@@ -576,6 +576,13 @@ void WINAPI OutputDebugStringA(
   _In_opt_ LPCTSTR lpOutputString
 );
 
+typedef struct {
+  DWORD id;
+  const char *name;
+  const char *data;
+} cmdmsg_t;
+
+extern const cmdmsg_t g_cmdmsg[];
 
 #include "_locale.h"
 #include "_time.h"

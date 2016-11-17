@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <libgen.h>
 #include <sys/statvfs.h>
+#include <dirent.h>
 
 // Portable implementations of Windows Kernel32 functions
 // https://github.com/sduirc/slippage-free/blob/c7ea1f3d69166e7ee61bd7668b58bee5dd8a8d08/Slippage/libc/BFC/filex.h
@@ -499,8 +500,8 @@ BOOL WINAPI SetConsoleCtrlHandler(
 
 typedef struct _FIND_FILE_HANDLE
 {
-    int fp; // 文件夹的 fd
-    unsigned int idx; //文件的编号
+    DIR *fp;
+    struct dirent entry;
 } FIND_FILE_HANDLE;
 
 
@@ -509,10 +510,10 @@ HANDLE FindFirstFile(
     _Out_  LPWIN32_FIND_DATA lpFindFileData
 )
 {
-    int DirFp = -1;
+    DIR *DirFp = NULL;
     if (!lpFileName)
         return INVALID_HANDLE_VALUE;
-    DirFp = openat(AT_FDCWD, lpFileName, O_RDONLY | O_DIRECTORY | O_CLOEXEC);
+    DirFp = opendir(lpFileName);
     if (DirFp)
     {
         if (lpFindFileData)
@@ -521,102 +522,44 @@ HANDLE FindFirstFile(
             if (pHandle)
             {
                 memset(lpFindFileData, 0, sizeof(WIN32_FIND_DATA));
+                pHandle->fp = DirFp;
+                
                 strcpy(lpFindFileData->cFileName, "."); // fake first file name
                 lpFindFileData->dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
 
-                pHandle->fp = DirFp;
-                pHandle->idx = 0;
                 return (HANDLE)pHandle;
             }
         }
-        close(DirFp);
+        closedir(DirFp);
     }
     return INVALID_HANDLE_VALUE;
 }
 
 
-struct linux_dirent
-{
-    long           d_ino;
-    off_t          d_off;
-    unsigned short d_reclen;
-    char           d_name[];
-};
-
-
-// https://github.com/sincoder/libx/blob/master/kernel32.c
 BOOL FindNextFile(
     _In_   HANDLE hFindFile,
     _Out_  LPWIN32_FIND_DATA lpFindFileData
 )
 {
-	/*
-    FIND_FILE_HANDLE *pHandle = (FIND_FILE_HANDLE *)hFindFile;
-    if (pHandle && lpFindFileData)
+	FIND_FILE_HANDLE *pHandle = (FIND_FILE_HANDLE *)hFindFile;
+	if (pHandle && lpFindFileData)
     {
-        struct linux_dirent *d;
-        char buff[1024];
-        //int i = 0;
-        int ok = 0;
-        while ( 1 != ok )
-        {
-            int bpos, nread;
-            char d_type;
-            int inputLen = 1;
-            // get one file
-            while (1)
-            {
-                nread = syscall(SYS_getdents, pHandle->fp, buff, inputLen);
-                if (nread == -1 )
-                {
-                    if (errno == EINVAL)
-                    {
-                        inputLen ++;
-                        continue;
-                    }
-                }
-                break;
-            }
+    	while( TRUE ) {    		
+			struct dirent *result;
+			if( -1 == readdir_r(pHandle->fp, &pHandle->entry, &result) ) {
+				return FALSE;
+			}
 
-            if (nread == -1)
-            {
-                //dbg_msg("getdent error,error no : %d ", errno);
-                break;
-            }
-            if (nread == 0)
-                break;
-
-            for (bpos = 0; bpos < nread;)
-            {
-                d = (struct linux_dirent *) (buff + bpos);
-                if (strcmp(d->d_name, ".") == 0 )
-                {
-                    pHandle->idx ++;// skip .
-                }
-                else
-                {
-                    d_type = *(buff + bpos + d->d_reclen - 1);
-                    lpFindFileData->dwFileAttributes =
-                        (d_type == DT_DIR ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL);
-                    strncpy(lpFindFileData->cFileName,
-                                 d->d_name,
-                                 sizeof(lpFindFileData->cFileName));
-                    ok = 1;
-                    break;
-                }
-                bpos += d->d_reclen;
-            }
-        }
-
-        if (ok)
-        {
-            pHandle->idx ++;
-            return TRUE;
-        }
+			if (strcmp(result->d_name, ".") != 0 ) {
+	            lpFindFileData->dwFileAttributes =
+	                (result->d_type == DT_DIR ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL);
+	            strncpy(lpFindFileData->cFileName,
+	                         result->d_name,
+	                         sizeof(lpFindFileData->cFileName));
+	            return TRUE;
+	        }
+    	}
     }
-    return FALSE;
-    */
-    abort();
     return FALSE;
 }
 
@@ -627,7 +570,7 @@ BOOL FindClose(
     if (hFindFile)
     {
         FIND_FILE_HANDLE *p = (FIND_FILE_HANDLE *)hFindFile;
-        close(p->fp);
+        closedir(p->fp);
         free(p);
         return TRUE;
     }

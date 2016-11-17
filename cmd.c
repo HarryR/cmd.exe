@@ -1320,7 +1320,7 @@ Return Value:
         SetConTitle(pszTitle);
     }
 
-    rc = (*funcptr)(pcmdnode);
+    rc = funcptr(pcmdnode);
 
     ResetConTitle(pszTitleCur);
 
