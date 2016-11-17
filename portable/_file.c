@@ -478,18 +478,6 @@ BOOL WINAPI GetVolumeInformation(
 	return TRUE;
 }
 
-DWORD WINAPI SearchPath(
-  _In_opt_  LPCTSTR lpPath,
-  _In_      LPCTSTR lpFileName,
-  _In_opt_  LPCTSTR lpExtension,
-  _In_      DWORD   nBufferLength,
-  _Out_     LPTSTR  lpBuffer,
-  _Out_opt_ LPTSTR  *lpFilePart
-) {
-	abort();
-	return 0;
-}
-
 BOOL WINAPI SetConsoleCtrlHandler(
   _In_opt_ PHANDLER_ROUTINE HandlerRoutine,
   _In_     BOOL             Add
@@ -575,4 +563,247 @@ BOOL FindClose(
         return TRUE;
     }
     return FALSE;
+}
+
+// https://github.com/erick2red/coreclr/blob/d872d88defabcce0f9a1a92d2ddd4b1ded105d46/src/pal/src/file/path.cpp
+DWORD
+SearchPath(
+    IN LPCSTR lpPath,
+    IN LPCSTR lpFileName,
+    IN LPCSTR lpExtension,
+    IN DWORD nBufferLength,
+    OUT LPSTR lpBuffer,
+    OUT LPSTR *lpFilePart
+    )
+{
+    DWORD nRet = 0;
+    CHAR * FullPath;
+    size_t FullPathLength = 0;
+    //PathCharString FullPathPS;
+    //PathCharString CanonicalFullPathPS;
+    CHAR * CanonicalFullPath;
+    LPCSTR pPathStart;
+    LPCSTR pPathEnd;
+    size_t PathLength;
+    size_t FileNameLength;
+    DWORD length;
+    DWORD dw;
+
+    /*
+    ENTRY("SearchPathA(lpPath=%p (%s), lpFileName=%p (%s), lpExtension=%p, "
+          "nBufferLength=%u, lpBuffer=%p, lpFilePart=%p)\n",
+      lpPath,
+      lpPath, lpFileName, lpFileName, lpExtension, nBufferLength, lpBuffer, 
+          lpFilePart);
+     */
+
+    /* validate parameters */
+    
+    if(NULL == lpPath)
+    {
+        //assert("lpPath may not be NULL\n");
+        SetLastError(ERROR_INVALID_PARAMETER);
+        goto done;
+    }
+    if(NULL == lpFileName)
+    {
+        //assert("lpFileName may not be NULL\n");
+        SetLastError(ERROR_INVALID_PARAMETER);
+        goto done;
+    }
+    if(NULL != lpExtension)
+    {
+        //assert("lpExtension must be NULL, is %p instead\n", lpExtension);
+        SetLastError(ERROR_INVALID_PARAMETER);
+        goto done;
+    }
+
+    FileNameLength = strlen(lpFileName);
+
+    /* special case : if file name contains absolute path, don't search the 
+       provided path */
+    if('\\' == lpFileName[0] || '/' == lpFileName[0])
+    {
+        /* Canonicalize the path to deal with back-to-back '/', etc. */
+        length = FileNameLength;
+        CanonicalFullPath = malloc(length); //CanonicalFullPathPS.OpenStringBuffer(length);
+        if (NULL == CanonicalFullPath)
+        {
+            SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+            goto done;
+        }
+        dw = GetFullPathName(lpFileName, length+1, CanonicalFullPath, NULL);
+        //CanonicalFullPathPS.CloseBuffer(dw);
+        
+        if (length+1 < dw)
+        {
+            CanonicalFullPath = realloc(CanonicalFullPath, dw-1); // CanonicalFullPathPS.OpenStringBuffer(dw-1);
+            if (NULL == CanonicalFullPath)
+            {
+                SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+                goto done;
+            }
+            dw = GetFullPathName(lpFileName, dw,
+                                  CanonicalFullPath, NULL);
+            //CanonicalFullPathPS.CloseBuffer(dw);
+        }
+
+        if (dw == 0) 
+        {
+            /*WARN("couldn't canonicalize path <%s>, error is %#x. failing.\n",
+                 lpFileName, GetLastError());*/
+            SetLastError(ERROR_INVALID_PARAMETER);
+            goto done;
+        }
+
+        /* see if the file exists */
+        if(0 == access(CanonicalFullPath, F_OK))
+        {
+            /* found it */
+            nRet = dw;
+        }
+    }
+    else
+    {
+        LPCSTR pNextPath;
+        pNextPath = lpPath;
+    
+        while (*pNextPath) 
+        {
+            pPathStart = pNextPath;
+            
+            /* get a pointer to the end of the first path in pPathStart */
+            pPathEnd = strchr(pPathStart, ':');
+            if (!pPathEnd)
+            {
+                pPathEnd = pPathStart + strlen(pPathStart);
+                /* we want to break out of the loop after this pass, so let
+                   *pNextPath be '\0' */
+                pNextPath = pPathEnd;
+            }
+            else
+            {
+                /* point to the next component in the path string */
+                pNextPath = pPathEnd+1;
+            }
+    
+            PathLength = pPathEnd-pPathStart;
+    
+            if(0 == PathLength)
+            {
+                /* empty component : there were 2 consecutive ':' */
+                continue;
+            }
+    
+            /* Construct a pathname by concatenating one path from lpPath, '/' 
+               and lpFileName */
+            FullPathLength = PathLength + FileNameLength;
+            FullPath = malloc(FullPathLength+1); // FullPathPS.OpenStringBuffer(FullPathLength+1);
+            if (NULL == FullPath)
+            {
+                SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+                goto done;
+            }
+            memcpy(FullPath, pPathStart, PathLength);
+            FullPath[PathLength] = '/';
+            if (NULL == strncpy(&FullPath[PathLength+1], lpFileName, FullPathLength+1-PathLength) )
+            {
+                //ERROR("strcpy failed!\n");
+                SetLastError( ERROR_FILENAME_EXCED_RANGE );
+                nRet = 0;
+                goto done;
+            }
+
+            //FullPathPS.CloseBuffer(FullPathLength+1);            
+            /* Canonicalize the path to deal with back-to-back '/', etc. */
+            length = MAX_PATH; //MAX_LONGPATH; //Use it for first try
+            CanonicalFullPath = malloc(length); //CanonicalFullPathPS.OpenStringBuffer(length);
+            if (NULL == CanonicalFullPath)
+            {
+                SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+                goto done;
+            }
+            dw = GetFullPathName(FullPath, length+1,
+                                  CanonicalFullPath, NULL);
+            //CanonicalFullPathPS.CloseBuffer(dw);
+            
+            if (length+1 < dw)
+            {
+                CanonicalFullPath = realloc(CanonicalFullPath, dw-1); //CanonicalFullPathPS.OpenStringBuffer(dw-1);
+                dw = GetFullPathName(FullPath, dw,
+                                      CanonicalFullPath, NULL);
+                //CanonicalFullPathPS.CloseBuffer(dw);
+            }
+            
+            if (dw == 0) 
+            {
+                /* Call failed - possibly low memory.  Skip the path */
+                /*WARN("couldn't canonicalize path <%s>, error is %#x. "
+                     "skipping it\n", FullPath, GetLastError());*/
+                continue;
+            }
+    
+            /* see if the file exists */
+            if(0 == access(CanonicalFullPath, F_OK))
+            {
+                /* found it */
+                nRet = dw;
+                break;
+            }
+        }
+    }
+
+    if (nRet == 0) 
+    {
+       /* file not found anywhere; say so. in Windows, this always seems to say
+          FILE_NOT_FOUND, even if path doesn't exist */
+       SetLastError(ERROR_FILE_NOT_FOUND);
+    }
+    else
+    {
+        if (nRet < nBufferLength) 
+        {
+            if(NULL == lpBuffer)
+            {
+                /* Windows merily crashes here, but let's not */
+                /*ERROR("caller told us buffer size was %d, but buffer is NULL\n",
+                      nBufferLength);*/
+                SetLastError(ERROR_INVALID_PARAMETER);
+                nRet = 0;
+                goto done;
+            }
+            
+            if (strncpy(lpBuffer, CanonicalFullPath, nBufferLength))
+            {
+                //ERROR("strcpy failed!\n");
+                SetLastError( ERROR_FILENAME_EXCED_RANGE );
+                nRet = 0;
+                goto done;
+            }
+
+            if(NULL != lpFilePart)
+            {
+                *lpFilePart = strrchr(lpBuffer,'/');
+                if(NULL == *lpFilePart)
+                {
+                    //assert("no '/' in full path!\n");
+                    abort();
+                }
+                else
+                {
+                    /* point to character after last '/' */
+                    (*lpFilePart)++;
+                }
+            }
+        }
+        else
+        {
+            /* if buffer is too small, report required length, including 
+               terminating null */
+            nRet++;
+        }
+    }
+done:
+    //LOGEXIT("SearchPathA returns DWORD %u\n", nRet);
+    return nRet;
 }
