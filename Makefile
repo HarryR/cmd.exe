@@ -7,6 +7,7 @@ SOURCES=portable/compat.c \
 	portable/_ltoa.c \
 	portable/_file.c \
 	portable/cmdmsg.c \
+	portable/_msg.c \
 	cbatch.c \
 	cchcp.c \
 	cclock.c \

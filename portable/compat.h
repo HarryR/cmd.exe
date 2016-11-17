@@ -28,6 +28,13 @@
 #define CTRL_C_EVENT 0
 #define CTRL_BREAK_EVENT 1
 
+#if INTPTR_MAX == INT64_MAX
+#define _ARCH64BIT
+#elif INTPTR_MAX == INT32_MAX
+#define _ARCH32BIT
+#else
+#error Unknown pointer size or missing size macros!
+#endif
 
 // See: https://msdn.microsoft.com/en-gb/library/windows/desktop/aa383751(v=vs.85).aspx
 typedef unsigned char BYTE;
@@ -46,6 +53,12 @@ typedef int32_t LONG;
 typedef LONG *PLONG;
 typedef uint32_t ULONG, UINT;
 typedef ULONG *PULONG;
+#if defined(_ARCH64BIT)
+ typedef uint64_t ULONG_PTR;
+#else
+ typedef uint32_t ULONG_PTR;
+#endif
+typedef ULONG_PTR *PULONG_PTR;
 typedef TCHAR* PTCHAR;
 typedef void VOID;
 typedef VOID* PVOID;
@@ -474,6 +487,12 @@ void WINAPI DebugBreak(void);
 #define IMAGE_SUBSYSTEM_WINDOWS_GUI 2
 #define SCS_POSIX_BINARY 4
 
+typedef DWORD NTSTATUS;
+#define STATUS_SUCCESS                   ((DWORD)0x00000000L)
+#define STATUS_UNSUCCESSFUL              ((DWORD)0xC0000001L)
+#define STATUS_BUFFER_OVERFLOW           ((DWORD)0x80000005L)
+#define STATUS_INVALID_PARAMETER         ((DWORD)0xC000000DL)
+
 // FormatMessageWithArgs
 // https://github.com/gasgas4/NT_4.0_SourceCode/blob/84a03f73738328ea66034dca7cda79a857623720/nt4/private/windows/shell/cabinet/message.c
 
@@ -562,31 +581,22 @@ SIZE_T WINAPI VirtualQuery(
   _In_     SIZE_T                    dwLength
 );
 
-DWORD WINAPI FormatMessage(
-  _In_     DWORD   dwFlags,
-  _In_opt_ LPCVOID lpSource,
-  _In_     DWORD   dwMessageId,
-  _In_     DWORD   dwLanguageId,
-  _Out_    LPTSTR  lpBuffer,
-  _In_     DWORD   nSize,
-  _In_opt_ va_list *Arguments
-);
-
 void WINAPI OutputDebugStringA(
   _In_opt_ LPCTSTR lpOutputString
 );
 
-typedef struct {
-  DWORD id;
-  const char *name;
-  const char *data;
-} cmdmsg_t;
 
-extern const cmdmsg_t g_cmdmsg[];
+char *str_append(char *a, char *b);
+
+
+#ifndef ARGUMENT_PRESENT
+#define ARGUMENT_PRESENT(Argument) (Argument != 0)
+#endif // ARGUMENT_PRESENT
 
 #include "_locale.h"
 #include "_time.h"
 #include "_memory.h"
 #include "_file.h"
+#include "_msg.h"
 
 #endif

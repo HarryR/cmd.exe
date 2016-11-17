@@ -243,41 +243,6 @@ SIZE_T WINAPI VirtualQuery(
   return 0;
 }
 
-// https://msdn.microsoft.com/en-us/library/windows/desktop/ms679351(v=vs.85).aspx
-// TODO: implement me
-DWORD WINAPI FormatMessage(
-  _In_     DWORD   dwFlags,
-  _In_opt_ LPCVOID lpSource,
-  _In_     DWORD   dwMessageId,
-  _In_     DWORD   dwLanguageId,
-  _Out_    LPTSTR  lpBuffer,
-  _In_     DWORD   nSize,
-  _In_opt_ va_list *Arguments
-) {
-  int N = 0;
-  const cmdmsg_t *msg = NULL;
-  while( TRUE ) {
-    msg = &g_cmdmsg[N];
-    if( msg->id == 0 ) {      
-      msg = NULL;
-      break;
-    }
-    
-    if( msg->id == dwMessageId ) {
-      break;
-    }
-    N++;
-  }
-
-  if( msg == NULL ) {
-    snprintf(lpBuffer, nSize, "Message: %d (%x)\n", dwMessageId, dwMessageId);
-  }
-  else {
-    snprintf(lpBuffer, nSize, "%s", msg->data); 
-  }
-  return strlen(lpBuffer);
-}
-
 void WINAPI OutputDebugStringA(
   _In_opt_ LPCTSTR lpOutputString
 ) {
