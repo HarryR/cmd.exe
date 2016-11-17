@@ -425,7 +425,7 @@ DWORD WINAPI FormatMessage(
   const cmdmsg_t *msg = NULL;
   while( TRUE ) {
     msg = &g_cmdmsg[N];
-    if( msg->id == 0 ) {      
+    if( msg->id == 0xFFFFFFFF ) {      
       msg = NULL;
       break;
     }

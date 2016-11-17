@@ -11,10 +11,11 @@ def main():
     if len(sys.argv) < 2:
         print "Usage: parsemsg.py <file>"
         return 1
-    filename = sys.argv[1]
-    data = open(filename).read()
-    data = data.replace("\r\n", "\n")
-    entries = MSG_RX.findall(data)
+    entries = []
+    for filename in sys.argv[1:]:
+        data = open(filename).read()
+        data = data.replace("\r\n", "\n")
+        entries += MSG_RX.findall(data)
     print '#include "cmd.h"'
     print 'const cmdmsg_t g_cmdmsg[] = {'
     N = 0
@@ -24,7 +25,7 @@ def main():
             print ',',
         N += 1
         print '{0x%08xL, "%s", %s}' % (int(entry[0]), entry[1], msgstr)
-    print ', {0, "_END_", "_END_"}'
+    print ', {0xFFFFFFFF, "_END_", "_END_"}'
     print '};'
 
 

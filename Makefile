@@ -52,8 +52,8 @@ all: cmd.exe
 cmd.exe: $(OBJECTS)
 	$(CC) -o $@ $+
 
-portable/cmdmsg.c: cmdmsg.mc
-	./parsemsg.py $< > $@
+portable/cmdmsg.c: cmdmsg.mc portable/winerror.w
+	./parsemsg.py $+ > $@
 
 clean:
 	rm -f $(OBJECTS) cmd.exe
