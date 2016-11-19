@@ -127,8 +127,6 @@ UnDuRd(struct node   *, PTCHAR);
 void
 SPutC(PTCHAR, PTCHAR,int );
 
-PTCHAR
-argstr1();
 
 //
 // Used to set and reset ctlcseen flag
@@ -730,7 +728,7 @@ Return Value:
                 if ((prelemT->svhndl = Cdup(prelemT->rdhndl)) == BADHANDLE) {
 
                     DEBUG((MNGRP, RIOLVL, "SETRD: Cdup error=%d, errno=%d", GetLastError(), errno)) ;
-                    PutStdErr(MSG_RDR_HNDL_CREATE, ONEARG, argstr1(TEXT("%d"), (unsigned long)prelemT->rdhndl)) ;
+                    PutStdErr(MSG_RDR_HNDL_CREATE, ONEARG, argstr1(TEXT("%d"), prelemT->rdhndl)) ;
                     prelemT->svhndl = 0 ;
                     ResetRedir() ;
                     return(FAILURE) ;
@@ -745,7 +743,7 @@ Return Value:
         } else {
 
             DEBUG((MNGRP, RIOLVL, "SETRD: FileIsOpen ret'd FALSE")) ;
-            PutStdErr(MSG_RDR_HNDL_OPEN, ONEARG, argstr1(TEXT("%d"), (unsigned long)prelemT->rdhndl)) ;
+            PutStdErr(MSG_RDR_HNDL_OPEN, ONEARG, argstr1(TEXT("%d"), prelemT->rdhndl)) ;
             prelemT->svhndl = 0 ;
             ResetRedir() ;
             return(FAILURE) ;
@@ -765,7 +763,7 @@ Return Value:
                 DEBUG((MNGRP, RIOLVL, "SETRD: Cdup2 error=%d, errno=%d", GetLastError(), errno)) ;
                 ResetRedir() ;
 
-                PutStdErr(MSG_RDR_HNDL_CREATE, ONEARG, argstr1(TEXT("%d"), (ULONG)prelemT->rdhndl)) ;
+                PutStdErr(MSG_RDR_HNDL_CREATE, ONEARG, argstr1(TEXT("%d"), prelemT->rdhndl)) ;
                 return(FAILURE) ;
             } ;
 
@@ -831,7 +829,7 @@ Return Value:
                     Cclose(OpenStatus) ;
                     ResetRedir() ;
 
-                    PutStdErr(MSG_RDR_HNDL_CREATE, ONEARG, argstr1(TEXT("%d"), (ULONG)prelemT->rdhndl)) ;
+                    PutStdErr(MSG_RDR_HNDL_CREATE, ONEARG, argstr1(TEXT("%d"), prelemT->rdhndl)) ;
                     return(FAILURE) ;
 
                 } else {

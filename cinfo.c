@@ -449,8 +449,8 @@ eVersion(
     PutStdOut(MSG_MS_DOS_VERSION,
                 THREEARGS,
                 VerMsg,
-                argstr1( TEXT("%d"), (unsigned long)(vrs & 0xFF)),
-                argstr2( TEXT("%-2d"), (unsigned long)((vrs >> 8)& 0xFF))) ;
+                argstr1( TEXT("%d"), (vrs & 0xFF)),
+                argstr2( TEXT("%-2d"), ((vrs >> 8)& 0xFF))) ;
     if (n)                          /* Begins & ends with NLN only...   */
         cmd_printf(CrLf) ;          /* ...when not part of prompt.      */
 
@@ -581,12 +581,12 @@ TCHAR *drvspec ;
         } else {
            if (b && vol.name[0]) {
 /* M013 */    PutStdOut(MSG_DR_VOL_LABEL, TWOARGS,
-                        argstr1( TEXT("%c"), (unsigned long)c),
-                        argstr2( TEXT("%s"), (unsigned long)((int)vol.name))) ;
+                        argstr1( TEXT("%c"), c),
+                        argstr2( TEXT("%s"), ((int)vol.name))) ;
            }
            else {
 /* M013 */    PutStdOut(MSG_HAS_NO_LABEL, ONEARG,
-                          argstr1( TEXT("%c"), (unsigned long)c)) ;
+                          argstr1( TEXT("%c"), c)) ;
            }
 /* @@5 */  if (b) {           // FIX, FIX
               sprintf(Tmpbuffer, Fmt26,

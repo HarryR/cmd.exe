@@ -20,7 +20,7 @@ def main():
     print 'const cmdmsg_t g_cmdmsg[] = {'
     N = 0
     for entry in entries:
-        msgstr = json.dumps(entry[3] + "\n")
+        msgstr = json.dumps(entry[3])
         if N > 0:
             print ',',
         N += 1

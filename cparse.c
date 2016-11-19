@@ -1844,7 +1844,7 @@ void PSError( )
              {
 /*@@4*/           if (*TokBuf != NULLC)                    /* @@J1 if no data wrong then */
 /*@@4*/         {                             /* @@J1 do not give message   */
-                 PutStdErr(MSG_SYNERR_GENL, ONEARG, argstr1(TEXT("%s"), (unsigned long)((int)TokBuf)));
+                 PutStdErr(MSG_SYNERR_GENL, ONEARG, argstr1(TEXT("%s"), (TokBuf)));
 /*@@4*/         }                             /* @@J1                       */
              }
           }

@@ -539,19 +539,23 @@ PutMsg(unsigned int MsgNum, CRTHANDLE Handle, unsigned int NumOfArgs, va_list *a
  *
  */
 
-PTCHAR argstr1(format, arg)
-TCHAR *format;
-unsigned long arg;
+PTCHAR argstr1(TCHAR *format, ...)
 {
-        sprintf(&TmpBuf[MAX_PATH], format, arg);                      /* M020    */
+        //sprintf(&TmpBuf[MAX_PATH], format, arg);                      /* M020    */
+        va_list ap;
+        va_start(ap, format);
+        vsprintf(&TmpBuf[MAX_PATH], format, ap);                      /* M020    */
+        va_end(ap);
         return(&TmpBuf[MAX_PATH]);
 }
 
-TCHAR * argstr2(format, arg)
-TCHAR *format;
-unsigned long arg;
+TCHAR * argstr2(TCHAR *format, ...)
 {
-        sprintf(&TmpBuf[MAX_PATH*2], format, arg);                      /* M020    */
+        //sprintf(&TmpBuf[MAX_PATH*2], format, arg);                      /* M020    */
+        va_list ap;
+        va_start(ap, format);
+        vsprintf(&TmpBuf[MAX_PATH*2], format, ap);
+        va_end(ap);
         return(&TmpBuf[MAX_PATH*2]);
 }
 
@@ -1674,14 +1678,14 @@ TCHAR *fn;                      /* file name                       */
 unsigned int flags ;                    /* open flags                      */
 {
     //return(Copen_Work2(fn, flags, FILE_SHARE_READ | FILE_SHARE_WRITE, TRUE));
-    return Copen2(fn, flags);
+    return Copen2(fn, flags, FALSE);
 }
 
 CRTHANDLE
 Copen_Copy3(fn)
 TCHAR *fn;                      // file name                       
 {
-    return Copen2(fn, O_RDWR);
+    return Copen2(fn, O_RDWR, FALSE);
 /*
     HANDLE      handl ;         // Handle ret'd                    
     CRTHANDLE   rcode;          // return code                     

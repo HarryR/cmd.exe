@@ -1114,7 +1114,7 @@ badness2:
                 if ( a1info->buf->dwFileAttributes != A_D )
                   {
                    PutStdOut(MSG_FILES_MOVED, ONEARG,
-                   argstr1(TEXT("%9d"), (unsigned long)number_of_files_moved)) ;
+                   argstr1(TEXT("%9d"), number_of_files_moved)) ;
                   }
 
                 return(save_error == NO_ERROR ? SUCCESS : FAILURE) ;

@@ -528,7 +528,7 @@ shellexecsuccess:
  */
         if (ai == AI_DSCD) {                    /* DETach only     */
                 if (!GuiProcess)
-                        PutStdErr(MSG_PID_IS, ONEARG, argstr1(TEXT("%u"), (unsigned long)hChildProcess));
+                        PutStdErr(MSG_PID_IS, ONEARG, argstr1(TEXT("%u"), hChildProcess));
                 CloseHandle(ChildProcessInfo.hProcess);
                 hChildProcess = NULL ;
         } else if (ai == AI_KEEP) {             /* Async exec...   */

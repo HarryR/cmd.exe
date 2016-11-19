@@ -139,7 +139,7 @@ TCHAR *args;
                 rc = do_normal_copy(source, dest); /* @@4 @@5d */
         } ;
 
-        PutStdOut(MSG_FILES_COPIED, ONEARG, argstr1(TEXT("%9d"), (unsigned long)number_of_files_copied)) ;   /* M016 */
+        PutStdOut(MSG_FILES_COPIED, ONEARG, argstr1(TEXT("%9d"), number_of_files_copied)) ;   /* M016 */
 
         VerifyCurrent = GetSetVerMode(GSVM_GET);
 
@@ -239,11 +239,11 @@ CopyProgressRtn(
 {
     LARGE_INTEGER percent;
     percent.QuadPart = (TotalBytesTransferred.QuadPart * 100) / TotalFileSize.QuadPart;
-    PutStdOut( MSG_PROGRESS, ONEARG, argstr1(TEXT("%3d"), (unsigned long)percent.LowPart) );
+    PutStdOut( MSG_PROGRESS, ONEARG, argstr1(TEXT("%3d"), percent.LowPart) );
 
     if (CtrlCSeen) {
 
-        PutStdOut( MSG_PROGRESS, ONEARG, argstr1(TEXT("%3d"), (unsigned long)percent.LowPart) );
+        PutStdOut( MSG_PROGRESS, ONEARG, argstr1(TEXT("%3d"), percent.LowPart) );
         printf( "\n" );
 
         if (ReallyRestartable) {
@@ -2445,7 +2445,7 @@ int flag;
                 PutStdOut(messagenum, NOARGS);
         if (flag == CE_PCOUNT)
 
-                PutStdOut(MSG_FILES_COPIED, ONEARG, argstr1(TEXT("%9d"), (unsigned long)number_of_files_copied)) ;
+                PutStdOut(MSG_FILES_COPIED, ONEARG, argstr1(TEXT("%9d"), number_of_files_copied)) ;
 
         VerifyCurrent = GetSetVerMode(GSVM_GET);
 

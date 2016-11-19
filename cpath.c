@@ -113,7 +113,7 @@ TCHAR *arg ;
             i = GetLastError();
             if (i == ERROR_ALREADY_EXISTS) {
 
-                PutStdErr(MSG_DIR_EXISTS, ONEARG, argstr1(TEXT("%s"), (unsigned long)((int)arg)));
+                PutStdErr(MSG_DIR_EXISTS, ONEARG, argstr1(TEXT("%s"), (arg)));
 
              } else if ( i == ERROR_PATH_NOT_FOUND) {
 

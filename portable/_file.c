@@ -12,8 +12,54 @@
 // https://github.com/paulopina21/plxJukebox-11/blob/193996ac99b99badab3a1d422806942afca2ad01/xbmc/linux/XFileUtils.cpp
 // https://github.com/owen200008/ccbasic/blob/398474ac9d31abac09fc0d8ff2dc2bb714efdeef/src/file/file_linux.cpp
 
+static void
+str_replace( char *str, char find_char, char replace_char ) {
+  while( *str ) {
+    if( *str == '\\' ) {
+      *str = '/';
+    }
+    str++;
+  }
+}
 
-static DWORD ChangeFileAttributes(struct stat st)
+/** Convert C:\Dos\Path to /Dos/Path */
+static char *
+DOSPath2UNIXPath( const char* dos_path ) {
+  assert( dos_path != NULL );
+
+  char *unix_path = malloc(strlen(dos_path));
+
+  if( dos_path[1] == ':' ) {
+    if( toupper(dos_path[0]) != 'C' ) {
+      SetLastError(ERROR_INVALID_DRIVE);
+      abort();
+      return NULL;
+    }
+    strcpy(unix_path, &dos_path[2]);
+  }
+  else {
+    strcpy(unix_path, dos_path);
+  }
+
+  str_replace(unix_path, '\\', '/');
+  return unix_path;
+}
+
+/** Convert /Unix/Path to C:\Unix\Path */
+static char *
+UNIXPath2DOSPath( const char *unix_path ) {
+  assert( unix_path != NULL );
+  assert( unix_path[0] == '/' );
+  char *dos_path = malloc(strlen(unix_path) + 2);
+  dos_path[0] = 'C';
+  dos_path[1] = ':';
+  strcpy(&dos_path[2], unix_path);
+  str_replace(dos_path, '/', '\\');
+  return dos_path;
+}
+
+static DWORD
+ChangeFileAttributes(struct stat st)
 {
 	DWORD dwAttr = 0;
 	if(st.st_mode & S_IFDIR)
@@ -32,50 +78,73 @@ static DWORD ChangeFileAttributes(struct stat st)
 }
 
 
-DWORD GetFileAttributes(LPCTSTR lpFileName)
+DWORD
+GetFileAttributes(LPCTSTR lpFileName)
 {
 	struct stat st;
-	if(stat(lpFileName, &st) != 0)
+  char *unix_path = DOSPath2UNIXPath(lpFileName);
+  int ret = stat(lpFileName, &st);
+  free(unix_path);
+	if(ret != 0)
 	{
 		return INVALID_FILE_ATTRIBUTES;
 	}
 	return ChangeFileAttributes(st);
 }
 
-BOOL SetFileAttributes(LPCTSTR lpFileName,DWORD dwFileAttributes)
+BOOL
+SetFileAttributes(LPCTSTR lpFileName, DWORD dwFileAttributes)
 {
 	struct stat st;
-	if(stat(lpFileName, &st) != 0)
-	{
-		return FALSE;
-	}
-	DWORD dwThisAttr = 0;
-	if(access(lpFileName, W_OK) != 0)
-	{
-		dwThisAttr |= FILE_ATTRIBUTE_READONLY;
+  BOOL ret = FALSE;
+  char *unix_path = DOSPath2UNIXPath(lpFileName);
+
+	if(stat(unix_path, &st) == 0)
+  {
+    DWORD dwThisAttr = 0;
+    if(access(unix_path, W_OK) != 0)
+    {
+      dwThisAttr |= FILE_ATTRIBUTE_READONLY;
+    }
+
+    dwFileAttributes &= FILE_ATTRIBUTE_READONLY;
+    if(dwFileAttributes != dwThisAttr)
+    {
+      if(dwFileAttributes & FILE_ATTRIBUTE_READONLY) {
+        st.st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
+      }
+      else {
+        st.st_mode |= (S_IWUSR | S_IWGRP | S_IWOTH);
+      }
+      ret = (chmod(unix_path, st.st_mode) == 0);
+      if( ! ret ) {
+        // TODO: replace with errno to ERROR converter
+        SetLastError(ERROR_INVALID_FUNCTION);
+      }
+    }
+    else {
+      ret = TRUE;
+    }
+  }
+  else {
+    SetLastError(ERROR_FILE_NOT_FOUND);
 	}
 
-	dwFileAttributes &= FILE_ATTRIBUTE_READONLY;
-	if(dwFileAttributes == dwThisAttr)
-	{
-		return TRUE;
-	}
-	if(dwFileAttributes & FILE_ATTRIBUTE_READONLY)
-	{
-		st.st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
-	}
-	else
-	{
-		st.st_mode |= (S_IWUSR | S_IWGRP | S_IWOTH);
-	}
-	return chmod(lpFileName, st.st_mode) == 0;
+  free(unix_path);
+  return ret;
 }
 
 BOOL WINAPI MoveFile(
   _In_ LPCTSTR lpExistingFileName,
   _In_ LPCTSTR lpNewFileName
 ) {
-	return ! rename(lpExistingFileName, lpNewFileName);
+  char *unix_existing = DOSPath2UNIXPath(lpExistingFileName);
+  char *unix_new = DOSPath2UNIXPath(lpNewFileName);
+	BOOL ret = ! rename(lpExistingFileName, lpNewFileName);
+  // TODO: SetLastError errno to ERROR converter
+  free(unix_existing);
+  free(unix_new);
+  return ret;
 }
 
 BOOL WINAPI ReadFile(
@@ -107,7 +176,10 @@ DWORD WINAPI GetFileSize(
 }
 
 BOOL DeleteFile(LPCTSTR lpFileName) {
-  return 0 == unlinkat(AT_FDCWD, lpFileName, 0);
+  char *unix_path = DOSPath2UNIXPath(lpFileName);
+  BOOL ret = 0 == unlink(unix_path);
+  free(unix_path);
+  return ret;
 }
 
 BOOL WINAPI CloseFile(
@@ -211,7 +283,10 @@ FILE* WINAPI GetStdHandle(
 BOOL WINAPI SetCurrentDirectory(
   _In_ LPCTSTR lpPathName
 ) {
-	return ! chdir(lpPathName);
+  char *unix_path = DOSPath2UNIXPath(lpPathName);
+	BOOL ret = ! chdir(lpPathName);
+  free(unix_path);
+  return ret;
 }
 
 BOOL WINAPI GetBinaryType(
@@ -219,10 +294,13 @@ BOOL WINAPI GetBinaryType(
   _Out_ LPDWORD lpBinaryType
 ) {
 	struct stat sb;
+  BOOL ret = FALSE;
+  char *unix_path = DOSPath2UNIXPath(lpApplicationName);
 	if( ! stat(lpApplicationName, &sb) ) {
-		return sb.st_mode & S_IXUSR;
+		ret = sb.st_mode & S_IXUSR;
 	}
-	return FALSE;
+  free(unix_path);
+	return ret;
 }
 
 DWORD WINAPI GetFullPathName(
@@ -234,7 +312,8 @@ DWORD WINAPI GetFullPathName(
 	assert( lpFileName != NULL );
 	assert( nBufferLength > 0 );
 	assert( lpBuffer != NULL );
-
+  DWORD ret = 0;
+  char *unix_path = DOSPath2UNIXPath(lpFileName);
 	char *data = realpath(lpFileName, NULL);
 	if( data ) {
 		strncpy(lpBuffer, data, nBufferLength);
@@ -242,9 +321,12 @@ DWORD WINAPI GetFullPathName(
 		if( lpFilePart ) {
 			*lpFilePart = basename(lpBuffer);
 		}
-		return strlen(lpBuffer);
+		ret = strlen(lpBuffer);
 	}
-	// TODO: SetLastError
+  else {
+	 // TODO: SetLastError
+  }
+  free(unix_path);
 	return 0;
 }
 
@@ -274,14 +356,21 @@ DWORD WINAPI GetCurrentDirectory(
   _In_  DWORD  nBufferLength,
   _Out_ LPTSTR lpBuffer
 ) {
-	return getcwd(lpBuffer, nBufferLength) != NULL;
+  DWORD ret = 0;
+  char *wd = getwd(NULL);
+  char *dos_path = UNIXPath2DOSPath(wd);
+  strncpy(lpBuffer, dos_path, nBufferLength);	
+  ret = strlen(lpBuffer);
+  free(wd);
+  free(dos_path);
+  return ret;
 }
 
 UINT WINAPI GetWindowsDirectory(
   _Out_ LPTSTR lpBuffer,
   _In_  UINT   uSize
 ) {
-	strncpy(lpBuffer, "/bin/", uSize);
+	strncpy(lpBuffer, "C:\\BIN\\", uSize);
 	return strlen(lpBuffer);
 }
 
@@ -499,8 +588,10 @@ HANDLE FindFirstFile(
 )
 {
     DIR *DirFp = NULL;
-    if (!lpFileName)
+    if (!lpFileName) {
+        SetLastError(ERROR_INVALID_PARAMETER);
         return INVALID_HANDLE_VALUE;
+    }
     DirFp = opendir(lpFileName);
     if (DirFp)
     {
@@ -520,6 +611,7 @@ HANDLE FindFirstFile(
         }
         closedir(DirFp);
     }
+    SetLastError(ERROR_FILE_NOT_FOUND);
     return INVALID_HANDLE_VALUE;
 }
 

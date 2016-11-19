@@ -280,7 +280,7 @@ Return Value:
         case MINUS:
             if (fOff) {
                 PutStdErr(MSG_PARAMETER_FORMAT_NOT_CORRECT, ONEARG,
-                          argstr1(Fmt14,(unsigned long)((int)(pszTok+2))));
+                          argstr1(Fmt14,((pszTok+2))));
                 return( FAILURE );
             }
 
@@ -290,7 +290,7 @@ Return Value:
         default:
 
             PutStdErr(MSG_PARAMETER_FORMAT_NOT_CORRECT, ONEARG,
-                      argstr1(Fmt14,(unsigned long)((int)(pszTok+2))));
+                      argstr1(Fmt14,((pszTok+2))));
             return( FAILURE );
 
         } // switch

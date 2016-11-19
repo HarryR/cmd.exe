@@ -286,8 +286,8 @@ LoopThroughArgs (
   int PutStdOut(unsigned int MsgNum, unsigned int NumOfArgs, ...);
   int PutStdErr(unsigned int MsgNum, unsigned int NumOfArgs, ...);
   int PutMsg(unsigned int MsgNum, CRTHANDLE Handle, unsigned int NumOfArgs, va_list *arglist);
-  PTCHAR argstr1(TCHAR  *,unsigned long );
-  TCHAR   *argstr2(TCHAR   *,unsigned long );
+  PTCHAR argstr1(TCHAR  *, ... );
+  TCHAR   *argstr2(TCHAR   *, ... );
   CRTHANDLE Copen_Work(TCHAR   *,unsigned int ,unsigned int );
   CRTHANDLE Copen_Work2(TCHAR *,unsigned int ,unsigned int, unsigned);
   CRTHANDLE Copen(TCHAR   *,unsigned int );

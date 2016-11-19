@@ -26,6 +26,7 @@ DWORD WINAPI GetEnvironmentVariable(
     return 0;
   }
   strncpy(lpBuffer, data, nSize);
+  SetLastError(ERROR_SUCCESS);
   return strlen(lpBuffer);
 }
 

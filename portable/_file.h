@@ -19,6 +19,7 @@ BOOL WINAPI CloseFile(
   FILE *hFile
 );
 
+DWORD GetFileAttributes(LPCTSTR lpFileName);
 
 DWORD WINAPI GetFileSize(
   FILE  *hFile,

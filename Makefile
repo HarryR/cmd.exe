@@ -1,4 +1,4 @@
-CFLAGS = -Iportable -I. -ggdb -O0
+CFLAGS = -Iportable -I. -ggdb -O0 -DDBG=1
 
 SOURCES=portable/compat.c \
 	portable/_locale.c \

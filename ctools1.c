@@ -270,7 +270,7 @@ int ltaflags ;
                            if (multargs)     /* if cmd  failed then  (TYPE)*/
                            {                 /* display arg failed msg too */
                               PutStdErr(MSG_ERR_PROC_ARG, ONEARG,
-                                        argstr1(TEXT("%s"), (unsigned long)((int)tas)));
+                                        argstr1(TEXT("%s"), (tas)));
                            }
                         }
                         if ( error_code && !(ltaflags & LTA_CONT))
@@ -333,7 +333,7 @@ int ltaflags ;
                if (error_code && multargs)   /* error this time through */
                {
                   PutStdErr(MSG_ERR_PROC_ARG, ONEARG,
-                            argstr1(TEXT("%s"), (unsigned long)((int)tas)));
+                            argstr1(TEXT("%s"), (tas)));
                }
             }
             return( final_code ) ;

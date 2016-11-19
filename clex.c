@@ -300,7 +300,7 @@ unsigned lflag ;
 
         if (i >= MAXTOKLEN && c != (TCHAR) -1) { /* Token too long, complain */
 
-/* M025 */      PutStdErr(MSG_TOKEN_TOO_LONG, ONEARG, argstr1(TEXT("%s"), (unsigned long)((int)tokbuf)));
+/* M025 */      PutStdErr(MSG_TOKEN_TOO_LONG, ONEARG, argstr1(TEXT("%s"), (tokbuf)));
                 return((unsigned)LEXERROR) ;
         } ;
 
@@ -1030,8 +1030,8 @@ Return Value:
                             GetMsg( MSG_MS_DOS_VERSION,
                                     THREEARGS,
                                     VerMsg,
-                                    argstr1( TEXT("%d"), (unsigned long)(vrs & 0xFF)),
-                                    argstr2( TEXT("%-2d"), (unsigned long)((vrs >> 8)& 0xFF))
+                                    argstr1( TEXT("%d"), (vrs & 0xFF)),
+                                    argstr2( TEXT("%-2d"), ((vrs >> 8)& 0xFF))
                                   );
 
                             nUsed = _sntprintf( s, nLeft, Fmt14, MsgBuf );
