@@ -15,8 +15,8 @@
 static void
 str_replace( char *str, char find_char, char replace_char ) {
   while( *str ) {
-    if( *str == '\\' ) {
-      *str = '/';
+    if( *str == find_char ) {
+      *str = replace_char;
     }
     str++;
   }
