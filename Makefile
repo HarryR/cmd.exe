@@ -8,6 +8,7 @@ SOURCES=portable/compat.c \
 	portable/_file.c \
 	portable/cmdmsg.c \
 	portable/_msg.c \
+	portable/_error.c \
 	cbatch.c \
 	cchcp.c \
 	cclock.c \

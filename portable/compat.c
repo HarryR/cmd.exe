@@ -5,7 +5,6 @@
 
 static char *g_cmdline = NULL;
 
-static DWORD g_lasterror = 0;
 
 extern char **environ;
 
@@ -28,16 +27,6 @@ DWORD WINAPI GetEnvironmentVariable(
   strncpy(lpBuffer, data, nSize);
   SetLastError(ERROR_SUCCESS);
   return strlen(lpBuffer);
-}
-
-DWORD WINAPI GetLastError(void) {
-  return g_lasterror;
-}
-
-void WINAPI SetLastError(
-  _In_ DWORD dwErrCode
-) {
-  g_lasterror = dwErrCode;
 }
 
 char * 

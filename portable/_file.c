@@ -29,6 +29,8 @@ DOSPath2UNIXPath( const char* dos_path ) {
 
   char *unix_path = malloc(strlen(dos_path));
 
+  // If absolute path, e.g. C:\Derp\ - ensure it's C:
+  // But then omit drive prefix
   if( dos_path[1] == ':' ) {
     if( toupper(dos_path[0]) != 'C' ) {
       SetLastError(ERROR_INVALID_DRIVE);
@@ -85,9 +87,8 @@ GetFileAttributes(LPCTSTR lpFileName)
   char *unix_path = DOSPath2UNIXPath(lpFileName);
   int ret = stat(lpFileName, &st);
   free(unix_path);
-	if(ret != 0)
-	{
-		return INVALID_FILE_ATTRIBUTES;
+	if(ret != 0) {
+    return SetLastErrno();
 	}
 	return ChangeFileAttributes(st);
 }
@@ -118,8 +119,7 @@ SetFileAttributes(LPCTSTR lpFileName, DWORD dwFileAttributes)
       }
       ret = (chmod(unix_path, st.st_mode) == 0);
       if( ! ret ) {
-        // TODO: replace with errno to ERROR converter
-        SetLastError(ERROR_INVALID_FUNCTION);
+        SetLastErrno();
       }
     }
     else {
@@ -141,7 +141,9 @@ BOOL WINAPI MoveFile(
   char *unix_existing = DOSPath2UNIXPath(lpExistingFileName);
   char *unix_new = DOSPath2UNIXPath(lpNewFileName);
 	BOOL ret = ! rename(lpExistingFileName, lpNewFileName);
-  // TODO: SetLastError errno to ERROR converter
+  if( ! ret ) {
+    SetLastErrno();
+  }
   free(unix_existing);
   free(unix_new);
   return ret;
@@ -178,6 +180,9 @@ DWORD WINAPI GetFileSize(
 BOOL DeleteFile(LPCTSTR lpFileName) {
   char *unix_path = DOSPath2UNIXPath(lpFileName);
   BOOL ret = 0 == unlink(unix_path);
+  if( ! ret ) {
+    SetLastErrno();
+  }
   free(unix_path);
   return ret;
 }
