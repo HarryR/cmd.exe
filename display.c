@@ -1220,14 +1220,14 @@ Return Value:
             rc = WriteMsgString(pscr,
                                 MSG_DR_VOL_LABEL,
                                 TWOARGS,
-                                argstr1(TEXT("%s"), (ULONG)(szVolRoot)),
-                                argstr2(TEXT("%s"), (ULONG)szVolName ) ) ;
+                                argstr1(TEXT("%s"), szVolRoot),
+                                argstr1(TEXT("%s"), szVolName) ) ;
         } else {
 
             rc = WriteMsgString(pscr,
                                 MSG_HAS_NO_LABEL,
                                 ONEARG,
-                                argstr1(TEXT("%s"), (ULONG)(szVolRoot)) ) ;
+                                argstr1(TEXT("%s"), szVolRoot) ) ;
 
         }
 

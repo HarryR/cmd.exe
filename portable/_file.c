@@ -290,6 +290,9 @@ BOOL WINAPI SetCurrentDirectory(
 ) {
   char *unix_path = DOSPath2UNIXPath(lpPathName);
 	BOOL ret = ! chdir(lpPathName);
+  if( ! ret ) {
+    SetLastErrno();
+  }
   free(unix_path);
   return ret;
 }
@@ -303,9 +306,26 @@ BOOL WINAPI GetBinaryType(
   char *unix_path = DOSPath2UNIXPath(lpApplicationName);
 	if( ! stat(lpApplicationName, &sb) ) {
 		ret = sb.st_mode & S_IXUSR;
+    if( ret && lpBinaryType ) {
+      *lpBinaryType = SCS_POSIX_BINARY;
+    }
+    else {
+      SetLastError(ERROR_BAD_EXE_FORMAT);
+    }
 	}
+  else {
+    SetLastErrno();
+  }
   free(unix_path);
 	return ret;
+}
+
+char *DOSBasename(char *path) {
+  char *ptr = strrchr(path, '\\');
+  if( ptr && *ptr ) {
+    return &ptr[1];
+  }
+  return NULL;
 }
 
 DWORD WINAPI GetFullPathName(
@@ -319,20 +339,23 @@ DWORD WINAPI GetFullPathName(
 	assert( lpBuffer != NULL );
   DWORD ret = 0;
   char *unix_path = DOSPath2UNIXPath(lpFileName);
-	char *data = realpath(lpFileName, NULL);
-	if( data ) {
-		strncpy(lpBuffer, data, nBufferLength);
-		free(data);
-		if( lpFilePart ) {
-			*lpFilePart = basename(lpBuffer);
-		}
+  char resolved_path[PATH_MAX];
+
+	if( realpath(unix_path, resolved_path) )
+  {
+    char *dos_path = UNIXPath2DOSPath(resolved_path);
+		strncpy(lpBuffer, dos_path, nBufferLength);
+    free(dos_path);
+    if( lpFilePart ) {
+      *lpFilePart = DOSBasename(lpBuffer);
+    }
 		ret = strlen(lpBuffer);
 	}
   else {
-	 // TODO: SetLastError
+    SetLastErrno();
   }
   free(unix_path);
-	return 0;
+	return ret;
 }
 
 BOOL WINAPI WriteConsole(
@@ -362,11 +385,11 @@ DWORD WINAPI GetCurrentDirectory(
   _Out_ LPTSTR lpBuffer
 ) {
   DWORD ret = 0;
-  char *wd = getwd(NULL);
+  char wd[PATH_MAX];
+  getcwd(wd, sizeof(wd));
   char *dos_path = UNIXPath2DOSPath(wd);
   strncpy(lpBuffer, dos_path, nBufferLength);	
   ret = strlen(lpBuffer);
-  free(wd);
   free(dos_path);
   return ret;
 }
@@ -410,7 +433,7 @@ BOOL WINAPI FlushFileBuffers(
 BOOL WINAPI FlushConsoleInputBuffer(
   _In_ FILE* hConsoleInput
 ) {
-	fpurge(hConsoleInput);
+	fflush(hConsoleInput);
 	return TRUE;
 }
 
@@ -587,6 +610,7 @@ typedef struct _FIND_FILE_HANDLE
 } FIND_FILE_HANDLE;
 
 
+// https://github.com/gbarnett/shared-source-cli-2.0/blob/d63349c09c2e93e4bfc4c8b147ff0805f36cec68/pal/unix/file/find.c
 HANDLE FindFirstFile(
     _In_   LPCTSTR lpFileName,
     _Out_  LPWIN32_FIND_DATA lpFindFileData
