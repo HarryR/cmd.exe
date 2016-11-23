@@ -161,19 +161,6 @@ BOOL WINAPI GetVolumeInformation(
   _In_      DWORD   nFileSystemNameSize
 );
 
-HANDLE FindFirstFile(
-    _In_   LPCTSTR lpFileName,
-    _Out_  LPWIN32_FIND_DATA lpFindFileData
-);
-
-BOOL FindNextFile(
-    _In_   HANDLE hFindFile,
-    _Out_  LPWIN32_FIND_DATA lpFindFileData
-);
-
-BOOL FindClose(
-    _Inout_  HANDLE hFindFile
-);
 
 DWORD WINAPI SearchPath(
   _In_opt_  LPCTSTR lpPath,

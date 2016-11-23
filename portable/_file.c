@@ -4,7 +4,6 @@
 #include <assert.h>
 #include <libgen.h>
 #include <sys/statvfs.h>
-#include <dirent.h>
 
 // Portable implementations of Windows Kernel32 functions
 // https://github.com/sduirc/slippage-free/blob/c7ea1f3d69166e7ee61bd7668b58bee5dd8a8d08/Slippage/libc/BFC/filex.h
@@ -12,53 +11,6 @@
 // https://github.com/paulopina21/plxJukebox-11/blob/193996ac99b99badab3a1d422806942afca2ad01/xbmc/linux/XFileUtils.cpp
 // https://github.com/owen200008/ccbasic/blob/398474ac9d31abac09fc0d8ff2dc2bb714efdeef/src/file/file_linux.cpp
 
-static void
-str_replace( char *str, char find_char, char replace_char ) {
-  while( *str ) {
-    if( *str == find_char ) {
-      *str = replace_char;
-    }
-    str++;
-  }
-}
-
-/** Convert C:\Dos\Path to /Dos/Path */
-static char *
-DOSPath2UNIXPath( const char* dos_path ) {
-  assert( dos_path != NULL );
-
-  char *unix_path = malloc(strlen(dos_path));
-
-  // If absolute path, e.g. C:\Derp\ - ensure it's C:
-  // But then omit drive prefix
-  if( dos_path[1] == ':' ) {
-    if( toupper(dos_path[0]) != 'C' ) {
-      SetLastError(ERROR_INVALID_DRIVE);
-      abort();
-      return NULL;
-    }
-    strcpy(unix_path, &dos_path[2]);
-  }
-  else {
-    strcpy(unix_path, dos_path);
-  }
-
-  str_replace(unix_path, '\\', '/');
-  return unix_path;
-}
-
-/** Convert /Unix/Path to C:\Unix\Path */
-static char *
-UNIXPath2DOSPath( const char *unix_path ) {
-  assert( unix_path != NULL );
-  assert( unix_path[0] == '/' );
-  char *dos_path = malloc(strlen(unix_path) + 2);
-  dos_path[0] = 'C';
-  dos_path[1] = ':';
-  strcpy(&dos_path[2], unix_path);
-  str_replace(dos_path, '/', '\\');
-  return dos_path;
-}
 
 static DWORD
 ChangeFileAttributes(struct stat st)
@@ -341,8 +293,27 @@ DWORD WINAPI GetFullPathName(
   char *unix_path = DOSPath2UNIXPath(lpFileName);
   char resolved_path[PATH_MAX];
 
+  char *tmp_dos_path = strdup(lpFileName);
+  char *extra_filename = DOSBasename(tmp_dos_path);
+  if( extra_filename != NULL && *extra_filename && strchr(extra_filename, '*') ) {
+    // Filename part contains wildcard
+    // Perform basename on directory only
+    char extra_tmp = extra_filename[0];
+    extra_filename[0] = 0;
+    free(unix_path);
+    unix_path = DOSPath2UNIXPath(tmp_dos_path);
+    extra_filename[0] = extra_tmp;    
+  }
+  else {
+    extra_filename = NULL;
+  }
+
 	if( realpath(unix_path, resolved_path) )
   {
+    if( extra_filename ) {      
+      strcat(resolved_path, "\\");
+      strcat(resolved_path, extra_filename);
+    }
     char *dos_path = UNIXPath2DOSPath(resolved_path);
 		strncpy(lpBuffer, dos_path, nBufferLength);
     free(dos_path);
@@ -354,6 +325,7 @@ DWORD WINAPI GetFullPathName(
   else {
     SetLastErrno();
   }
+  free(tmp_dos_path);
   free(unix_path);
 	return ret;
 }
@@ -587,7 +559,7 @@ BOOL WINAPI GetVolumeInformation(
 	if( lpVolumeSerialNumber )
 		*lpVolumeSerialNumber = 0x12345678;
 	if( lpMaximumComponentLength )
-		*lpMaximumComponentLength = 0xFF;
+		*lpMaximumComponentLength = 260;
 	if( lpFileSystemFlags )
 		*lpFileSystemFlags = 0x00000002 | 0x00000001 | 0x00000040;
 	if( lpFileSystemNameBuffer )
@@ -601,89 +573,6 @@ BOOL WINAPI SetConsoleCtrlHandler(
 ) {
 	//abort();
 	return FALSE;
-}
-
-typedef struct _FIND_FILE_HANDLE
-{
-    DIR *fp;
-    struct dirent entry;
-} FIND_FILE_HANDLE;
-
-
-// https://github.com/gbarnett/shared-source-cli-2.0/blob/d63349c09c2e93e4bfc4c8b147ff0805f36cec68/pal/unix/file/find.c
-HANDLE FindFirstFile(
-    _In_   LPCTSTR lpFileName,
-    _Out_  LPWIN32_FIND_DATA lpFindFileData
-)
-{
-    DIR *DirFp = NULL;
-    if (!lpFileName) {
-        SetLastError(ERROR_INVALID_PARAMETER);
-        return INVALID_HANDLE_VALUE;
-    }
-    DirFp = opendir(lpFileName);
-    if (DirFp)
-    {
-        if (lpFindFileData)
-        {
-            FIND_FILE_HANDLE *pHandle = (FIND_FILE_HANDLE *)malloc(sizeof(FIND_FILE_HANDLE));
-            if (pHandle)
-            {
-                memset(lpFindFileData, 0, sizeof(WIN32_FIND_DATA));
-                pHandle->fp = DirFp;
-                
-                strcpy(lpFindFileData->cFileName, "."); // fake first file name
-                lpFindFileData->dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
-
-                return (HANDLE)pHandle;
-            }
-        }
-        closedir(DirFp);
-    }
-    SetLastError(ERROR_FILE_NOT_FOUND);
-    return INVALID_HANDLE_VALUE;
-}
-
-
-BOOL FindNextFile(
-    _In_   HANDLE hFindFile,
-    _Out_  LPWIN32_FIND_DATA lpFindFileData
-)
-{
-	FIND_FILE_HANDLE *pHandle = (FIND_FILE_HANDLE *)hFindFile;
-	if (pHandle && lpFindFileData)
-    {
-    	while( TRUE ) {    		
-			struct dirent *result;
-			if( -1 == readdir_r(pHandle->fp, &pHandle->entry, &result) ) {
-				return FALSE;
-			}
-
-			if (strcmp(result->d_name, ".") != 0 ) {
-	            lpFindFileData->dwFileAttributes =
-	                (result->d_type == DT_DIR ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL);
-	            strncpy(lpFindFileData->cFileName,
-	                         result->d_name,
-	                         sizeof(lpFindFileData->cFileName));
-	            return TRUE;
-	        }
-    	}
-    }
-    return FALSE;
-}
-
-BOOL FindClose(
-    _Inout_  HANDLE hFindFile
-)
-{
-    if (hFindFile)
-    {
-        FIND_FILE_HANDLE *p = (FIND_FILE_HANDLE *)hFindFile;
-        closedir(p->fp);
-        free(p);
-        return TRUE;
-    }
-    return FALSE;
 }
 
 // https://github.com/erick2red/coreclr/blob/d872d88defabcce0f9a1a92d2ddd4b1ded105d46/src/pal/src/file/path.cpp

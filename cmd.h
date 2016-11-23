@@ -730,8 +730,14 @@ struct ifnode {                 /* Used for IF commands                    */
  * defined.  Otherwise, it expands to NULL.
  */
 
+#define ERROR(...) fprintf(stderr, __VA_ARGS__);
+#define ON_ERROR abort();
+
 #if DBG
 #define DEBUG(a) Deb a
+#define TRACE(...) fprintf(stderr, __VA_ARGS__)
+#define WARN(...) fprintf(stderr, __VA_ARGS__)
+#define ASSERT(...) do { fprintf(stderr, __VA_ARGS__); abort(); } while (0)
 
 /* The following are definitions of the debugging group and level bits
  * for the code in cbatch.c
@@ -864,6 +870,9 @@ struct ifnode {                 /* Used for IF commands                    */
 
 #else
 #define DEBUG(a)
+#define TRACE(...)
+#define WARN(...)
+#define ASSERT(...)
 #endif
 
 

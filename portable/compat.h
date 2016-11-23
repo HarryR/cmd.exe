@@ -126,19 +126,6 @@ typedef struct _FILETIME {
   DWORD dwHighDateTime;
 } FILETIME, *PFILETIME, *LPFILETIME;
 
-// https://msdn.microsoft.com/en-us/library/windows/desktop/aa365740(v=vs.85).aspx
-typedef struct _WIN32_FIND_DATA {
-  DWORD    dwFileAttributes;
-  FILETIME ftCreationTime;
-  FILETIME ftLastAccessTime;
-  FILETIME ftLastWriteTime;
-  DWORD    nFileSizeHigh;
-  DWORD    nFileSizeLow;
-  DWORD    dwReserved0;
-  DWORD    dwReserved1;
-  TCHAR    cFileName[MAX_PATH];
-  TCHAR    cAlternateFileName[14];
-} WIN32_FIND_DATA, *PWIN32_FIND_DATA, *LPWIN32_FIND_DATA;
 
 typedef struct _SHELLEXECUTEINFO {
   DWORD     cbSize;
@@ -534,5 +521,7 @@ char *str_append(char *a, char *b);
 #include "_file.h"
 #include "_msg.h"
 #include "_error.h"
+#include "_path.h"
+#include "_find.h"
 
 #endif

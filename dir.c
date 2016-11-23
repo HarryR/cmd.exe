@@ -300,7 +300,6 @@ Dir (
 
     }
 
-
     DEBUG((ICGRP, DILVL, "Dir: Parameters")) ;
     DEBUG((ICGRP, DILVL, "\t rgfSwitchs %x", drpCur.rgfSwitchs)) ;
     DEBUG((ICGRP, DILVL, "\t rgfAttribs %x", drpCur.rgfAttribs)) ;
@@ -1157,7 +1156,6 @@ GetDrive(
     //
     GetDir((PTCHAR)szCurDrv,GD_DEFAULT);
     szDrive[0] = szCurDrv[0];
-
 
     //
     // If we have a UNC name do not return a drive. No

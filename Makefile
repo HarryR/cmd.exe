@@ -1,4 +1,4 @@
-CFLAGS = -Iportable -I. -ggdb -O0 -DDBG=1
+CFLAGS = -Iportable -I. -ggdb -O0 # -DDBG=1
 
 SOURCES=portable/compat.c \
 	portable/_locale.c \
@@ -9,6 +9,8 @@ SOURCES=portable/compat.c \
 	portable/cmdmsg.c \
 	portable/_msg.c \
 	portable/_error.c \
+	portable/_path.c \
+	portable/_find.c \
 	cbatch.c \
 	cchcp.c \
 	cclock.c \
