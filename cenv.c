@@ -911,7 +911,7 @@ struct envdata *env ;
     if (!_tcslen(varvalue)) {
         varvalue = NULL; // null to remove from env
     }
-    return SetEnvironmentVariable(varname, varvalue);
+    return SetEnvironmentVariable(varname, varvalue) ? SUCCESS : FAILURE;
     /*
     if (CmdEnv.handle != GetEnvironmentStrings()) {
         MEMORY_BASIC_INFORMATION MemoryInfo;

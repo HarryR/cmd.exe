@@ -37,7 +37,7 @@ GetFileAttributes(LPCTSTR lpFileName)
 {
 	struct stat st;
   char *unix_path = DOSPath2UNIXPath(lpFileName);
-  int ret = stat(lpFileName, &st);
+  int ret = stat(unix_path, &st);
   free(unix_path);
 	if(ret != 0) {
     return SetLastErrno();
@@ -241,7 +241,7 @@ BOOL WINAPI SetCurrentDirectory(
   _In_ LPCTSTR lpPathName
 ) {
   char *unix_path = DOSPath2UNIXPath(lpPathName);
-	BOOL ret = ! chdir(lpPathName);
+	BOOL ret = ! chdir(unix_path);
   if( ! ret ) {
     SetLastErrno();
   }
